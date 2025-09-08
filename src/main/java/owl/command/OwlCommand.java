@@ -94,9 +94,12 @@ public final class OwlCommand extends AbstractOwlCommand {
   }
 
   public static void main(String[] args) {
-    System.exit(new CommandLine(new OwlCommand(args))
-      .setExecutionExceptionHandler(new ExecutionExceptionHandler())
-      .execute(args));
+    // Start point of the project
+      System.out.println("***\nOWL started\n***\n");
+    Mixins.rebeca_main();
+    // System.exit(new CommandLine(new OwlCommand(args))
+    //   .setExecutionExceptionHandler(new ExecutionExceptionHandler())
+    //   .execute(args));
   }
 
   @Override

@@ -101,6 +101,15 @@ dependencies {
     // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk
     implementation("org.graalvm.sdk", "graal-sdk", "22.1.0")
 
+
+    // https://github.com/FasterXML/jackson
+    implementation("com.fasterxml.jackson.core", "jackson-core", "2.17.2")
+    implementation("com.fasterxml.jackson.core", "jackson-annotations", "2.17.2")
+    implementation("com.fasterxml.jackson.core", "jackson-databind", "2.17.2")
+    implementation("com.fasterxml.jackson.module", "jackson-module-kotlin", "2.17.2")
+    implementation("com.fasterxml.jackson.datatype", "jackson-datatype-jsr310", "2.17.2") // Java 8 Date/Time support
+
+
     // https://github.com/google/gson
     testImplementation("com.google.code.gson", "gson", "2.8.5")
 

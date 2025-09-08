@@ -51,7 +51,7 @@ public final class Literal extends Formula.PropositionalOperator {
   }
 
   // TODO: do not leak 'this'
-  private Literal(@Nonnegative int index) {
+  public Literal(@Nonnegative int index) {
     super(Literal.class, List.of(), Integer.hashCode(index + 1));
     checkIndex(index, Integer.MAX_VALUE);
     this.index = index + 1;

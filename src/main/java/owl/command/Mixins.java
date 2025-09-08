@@ -48,7 +48,13 @@ import owl.automaton.acceptance.OmegaAcceptanceCast;
 import owl.automaton.hoa.HoaReader;
 import owl.automaton.hoa.HoaWriter;
 import owl.bdd.FactorySupplier;
-import owl.ltl.LabelledFormula;
+import owl.ltl.*;
+// import owl.ltl.LabelledFormula;
+
+// import owl.ltl.Literal;
+// import owl.ltl.Conjunction;
+
+
 import owl.ltl.parser.LtlParser;
 import owl.ltl.visitors.PrintVisitor;
 import owl.thirdparty.jhoafparser.consumer.HOAConsumerException;
@@ -57,12 +63,31 @@ import owl.thirdparty.jhoafparser.owl.extensions.HOAConsumerPrintFixed;
 import owl.thirdparty.jhoafparser.owl.extensions.ToStateAcceptanceFixed;
 import owl.thirdparty.jhoafparser.parser.generated.ParseException;
 
+import java.io.File;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.kotlin.KotlinModule;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+import static owl.thirdparty.picocli.CommandLine.ArgGroup;
+import static owl.thirdparty.picocli.CommandLine.Option;
+
+// import owl.ltl.Formula;
+
+
 @SuppressWarnings("PMD.ImmutableField")
 final class Mixins {
 
   private Mixins() {}
 
-  static final class AutomatonReader {
+  static final class AutomatonReader{ 
 
     @Option(
       names = { "-i", "--input-file" },
@@ -205,7 +230,13 @@ final class Mixins {
   }
 
   static final class FormulaReader {
-
+    @Override
+    public String toString() {
+      return "FormulaReader{" +
+              "source=" + source +
+              '}';
+    }
+    
     @ArgGroup
     private Source source = null;
 
@@ -276,7 +307,195 @@ final class Mixins {
         }
       });
     }
+
+    // new
+    public static LabelledFormula createExampleLabelledFormula() {
+
+     List<String> atomicPropositions = List.of("a", "b");
+
+     Literal p0 = new Literal(0); // "p0" -> "a"
+
+     // Gp1
+     Literal p1 = new Literal(1); // "p1" represents "b"
+     GOperator Gp1 = new GOperator(p1); // G(b)
+
+     // conjunction formula (p0 & Gp1)
+     Conjunction conjunction = new Conjunction(List.of(p0, Gp1));
+
+     // FOperator formula (F(p0 & Gp1))
+     FOperator fOperator = new FOperator(conjunction);
+
+     return LabelledFormula.of(fOperator, atomicPropositions);
+   }
+
+   // /new
   }
+  // changin
+
+  
+
+
+//  class LTLDefinition {
+//    public Expression expression;
+//    public String name;
+//  }
+
+
+//  class Expression {
+//    public List<Object> annotations;
+//    public int lineNumber;
+//    public int character;
+//    public Object type;
+//    public Expression left;
+//    public Expression right;
+//    public String operator;
+//    public String label;
+//    public TermPrimary parentSuffixPrimary;
+//    public List<Object> indices;
+//    public String name;
+//  }
+
+
+//  class TermPrimary {
+//    public List<Argument> arguments;
+//    public int lineNumber;
+//    public int character;
+//    public Object type;
+//    public String label;
+//    public Object parentSuffixPrimary;
+//    public List<Object> indices;
+//    public String name;
+//  }
+
+//  class Argument {
+//    public List<Object> annotations;
+//    public int lineNumber;
+//    public int character;
+//    public Object type;
+//    public String label;
+//    public Object parentSuffixPrimary;
+//    public List<Object> indices;
+//    public String name;
+//  }
+
+
+
+
+
+
+  public static class Converter {
+
+    // public static Formula convertToFormula(BinaryExpression binaryExpression) {
+    //   if ("&&".equals(binaryExpression.getOperator())) {
+    //     // Handle conjunction (&&)
+    //     Formula leftFormula = convertToFormula(binaryExpression.getLeft());
+    //     Formula rightFormula = convertToFormula(binaryExpression.getRight());
+    //     return new Conjunction(Arrays.asList(leftFormula, rightFormula));
+    //   } else if ("||".equals(binaryExpression.getOperator())) {
+    //     // Handle disjunction (||)
+    //     Formula leftFormula = convertToFormula(binaryExpression.getLeft());
+    //     Formula rightFormula = convertToFormula(binaryExpression.getRight());
+    //     return new Disjunction(Arrays.asList(leftFormula, rightFormula));
+    //   }else if ("G".equals(binaryExpression.getOperator())) {
+    //     // Handle G operator
+    //     return new GOperator(convertToFormula(binaryExpression.getLeft()));
+    //   } else if ("F".equals(binaryExpression.getOperator())) {
+    //     // Handle F operator
+    //     return new FOperator(convertToFormula(binaryExpression.getLeft()));
+    //   } else if ("M".equals(binaryExpression.getOperator())) {
+    //     // Handle M operator
+    //     return new MOperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
+    //   }else if ("R".equals(binaryExpression.getOperator())) {
+    //     // Handle R operator
+    //     return new ROperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
+    //   }else if ("U".equals(binaryExpression.getOperator())) {
+    //     // Handle U operator
+    //     return new UOperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
+    //   }else if ("W".equals(binaryExpression.getOperator())) {
+    //     // Handle W operator
+    //     return new WOperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
+    //   }else if ("X".equals(binaryExpression.getOperator())) {
+    //     // Handle X operator
+    //     return new XOperator(convertToFormula(binaryExpression.getLeft()));
+    //   } else if ("X".equals(binaryExpression.getOperator())) {
+    //     // Handle X operator
+    //     return new XOperator(convertToFormula(binaryExpression.getLeft()));
+    //   }
+    //   return null; // Add more cases as needed
+    // }
+
+    // // Method to convert a general Expression to Formula
+    // public static Formula convertToFormula(Expression expression) {
+    //   if (expression instanceof TermPrimary) {
+    //     TermPrimary termPrimary = (TermPrimary) expression;
+    //     return new Literal(termPrimary.getCharacter());
+    //   } else if (expression instanceof BinaryExpression) {
+    //     return convertToFormula((BinaryExpression) expression);
+    //   }
+    //   return null; // Add more cases as needed
+    // }
+
+    // // Convert an LTLDefinition to LabelledFormula
+    // public static LabelledFormula convertToLabelledFormula(LTLDefinition ltlDefinition) {
+    //   Formula formula = convertToFormula(ltlDefinition.getExpression());
+    //   BitSet atomicPropsBitSet = formula.atomicPropositions(true); // Collect atomic propositions
+    //   List<String> atomicProps = LabelledFormula.bitSetToStrings(atomicPropsBitSet); // Convert BitSet to List<String>
+
+    //   // Return LabelledFormula using the 'of' method
+    //   return LabelledFormula.of(formula, atomicProps);
+    // }
+
+  }
+
+  //    // Function to parse LTLDefinition into a LabelledFormula
+  //  public static LabelledFormula parseLtlDefinitionToLabelledFormula(LTLDefinition ltlDefinition) {
+  //    Formula formula = parseExpression(ltlDefinition.expression);
+  //    return new AutoValue_LabelledFormula(ltlDefinition.name, formula);
+  //  }
+
+   // Function to read and parse the LTLDefinition from JSON and return a stream of LabelledFormulas
+   public static Stream<LabelledFormula> parseLtlDefinitionFromJson(String filePath) throws IOException {
+    //  ObjectMapper mapper = new ObjectMapper();
+    //  LTLDefinition ltlDefinition;
+     
+     
+
+    //  //mapper.readValue(new File(filePath), LTLDefinition.class);
+    //  System.out.println(ltlDefinition);
+
+     System.out.println("ObjectMapper function 2\n ***\n");
+    return null;
+    //  return Stream.of(parseLtlDefinitionToLabelledFormula(ltlDefinition));
+   }
+   public static void rebeca_main() {
+     try {
+       // Path to your JSON file
+       String filePath = "ltlDefinition.json";
+
+       // Parse the JSON and create the LabelledFormula object
+       Stream<LabelledFormula> labelledFormulas = parseLtlDefinitionFromJson(filePath);
+
+       // Print the LabelledFormula object(s)
+      //  labelledFormulas.forEach(System.out::println);
+
+     } catch (IOException e) {
+       e.printStackTrace();
+     }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   static final class FormulaWriter {
 
