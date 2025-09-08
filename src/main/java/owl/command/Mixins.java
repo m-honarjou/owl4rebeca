@@ -39,6 +39,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import javax.swing.plaf.synth.SynthStyle;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import owl.automaton.Automaton;
@@ -308,10 +311,9 @@ final class Mixins {
     Stream<LabelledFormula> source() throws IOException {
       return stringSource().map((String line) -> {
         try {
-          return LtlParser.parse(line);
-          //var test = LtlParser.parse(line);
-          // var testing = convertingFacade();
-          // return testing;
+          // return LtlParser.parse(line);
+          // var test = LtlParser.parse(line);
+          return convertingFacade();
         } catch (RecognitionException | ParseCancellationException ex) {
           throw new IllegalArgumentException(line, ex);
         }
@@ -791,67 +793,139 @@ final class Mixins {
 
   public static class Converter {
 
-    // public static Formula convertToFormula(BinaryExpression binaryExpression) {
-    //   if ("&&".equals(binaryExpression.getOperator())) {
-    //     // Handle conjunction (&&)
-    //     Formula leftFormula = convertToFormula(binaryExpression.getLeft());
-    //     Formula rightFormula = convertToFormula(binaryExpression.getRight());
-    //     return new Conjunction(Arrays.asList(leftFormula, rightFormula));
-    //   } else if ("||".equals(binaryExpression.getOperator())) {
-    //     // Handle disjunction (||)
-    //     Formula leftFormula = convertToFormula(binaryExpression.getLeft());
-    //     Formula rightFormula = convertToFormula(binaryExpression.getRight());
-    //     return new Disjunction(Arrays.asList(leftFormula, rightFormula));
-    //   }else if ("G".equals(binaryExpression.getOperator())) {
-    //     // Handle G operator
-    //     return new GOperator(convertToFormula(binaryExpression.getLeft()));
-    //   } else if ("F".equals(binaryExpression.getOperator())) {
-    //     // Handle F operator
-    //     return new FOperator(convertToFormula(binaryExpression.getLeft()));
-    //   } else if ("M".equals(binaryExpression.getOperator())) {
-    //     // Handle M operator
-    //     return new MOperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
-    //   }else if ("R".equals(binaryExpression.getOperator())) {
-    //     // Handle R operator
-    //     return new ROperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
-    //   }else if ("U".equals(binaryExpression.getOperator())) {
-    //     // Handle U operator
-    //     return new UOperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
-    //   }else if ("W".equals(binaryExpression.getOperator())) {
-    //     // Handle W operator
-    //     return new WOperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
-    //   }else if ("X".equals(binaryExpression.getOperator())) {
-    //     // Handle X operator
-    //     return new XOperator(convertToFormula(binaryExpression.getLeft()));
-    //   } else if ("X".equals(binaryExpression.getOperator())) {
-    //     // Handle X operator
-    //     return new XOperator(convertToFormula(binaryExpression.getLeft()));
-    //   }
-    //   return null; // Add more cases as needed
-    // }
+    public static Formula convertToFormula(BinaryExpression binaryExpression) {
+      if ("&&".equals(binaryExpression.getOperator())) {
+        // Handle conjunction (&&)
+        Formula leftFormula = convertToFormula(binaryExpression.getLeft());
+        Formula rightFormula = convertToFormula(binaryExpression.getRight());
+        return new Conjunction(Arrays.asList(leftFormula, rightFormula));
+      } else if ("||".equals(binaryExpression.getOperator())) {
+        // Handle disjunction (||)
+        Formula leftFormula = convertToFormula(binaryExpression.getLeft());
+        Formula rightFormula = convertToFormula(binaryExpression.getRight());
+        return new Disjunction(Arrays.asList(leftFormula, rightFormula));
+      }else if ("G".equals(binaryExpression.getOperator())) {
+        // Handle G operator
+        return new GOperator(convertToFormula(binaryExpression.getLeft()));
+      } else if ("F".equals(binaryExpression.getOperator())) {
+        // Handle F operator
+        return new FOperator(convertToFormula(binaryExpression.getLeft()));
+      } else if ("M".equals(binaryExpression.getOperator())) {
+        // Handle M operator
+        return new MOperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
+      }else if ("R".equals(binaryExpression.getOperator())) {
+        // Handle R operator
+        return new ROperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
+      }else if ("U".equals(binaryExpression.getOperator())) {
+        // Handle U operator
+        return new UOperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
+      }else if ("W".equals(binaryExpression.getOperator())) {
+        // Handle W operator
+        return new WOperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
+      }else if ("X".equals(binaryExpression.getOperator())) {
+        // Handle X operator
+        return new XOperator(convertToFormula(binaryExpression.getLeft()));
+      } else if ("X".equals(binaryExpression.getOperator())) {
+        // Handle X operator
+        return new XOperator(convertToFormula(binaryExpression.getLeft()));
+      }
+      return null; // Add more cases as needed
+    }
 
-    // // Method to convert a general Expression to Formula
-    // public static Formula convertToFormula(Expression expression) {
-    //   if (expression instanceof TermPrimary) {
-    //     TermPrimary termPrimary = (TermPrimary) expression;
-    //     return new Literal(termPrimary.getCharacter());
-    //   } else if (expression instanceof BinaryExpression) {
-    //     return convertToFormula((BinaryExpression) expression);
-    //   }
-    //   return null; // Add more cases as needed
-    // }
+    // Method to convert a general Expression to Formula
+    public static Formula convertToFormula(Expression expression) {
+      if (expression instanceof TermPrimary) {
+        TermPrimary termPrimary = (TermPrimary) expression;
+        return new Literal(termPrimary.getCharacter());
+      } else if (expression instanceof BinaryExpression) {
+        return convertToFormula((BinaryExpression) expression);
+      }
+      return null; // Add more cases as needed
+    }
 
-    // // Convert an LTLDefinition to LabelledFormula
-    // public static LabelledFormula convertToLabelledFormula(LTLDefinition ltlDefinition) {
-    //   Formula formula = convertToFormula(ltlDefinition.getExpression());
-    //   BitSet atomicPropsBitSet = formula.atomicPropositions(true); // Collect atomic propositions
-    //   List<String> atomicProps = LabelledFormula.bitSetToStrings(atomicPropsBitSet); // Convert BitSet to List<String>
+    // Convert an LTLDefinition to LabelledFormula
+    public static LabelledFormula convertToLabelledFormula(LTLDefinition ltlDefinition) {
+      Formula formula = convertToFormula(ltlDefinition.getExpression());
+      BitSet atomicPropsBitSet = formula.atomicPropositions(true); // Collect atomic propositions
+      List<String> atomicProps = LabelledFormula.bitSetToStrings(atomicPropsBitSet); // Convert BitSet to List<String>
 
-    //   // Return LabelledFormula using the 'of' method
-    //   return LabelledFormula.of(formula, atomicProps);
-    // }
+      // Return LabelledFormula using the 'of' method
+      return LabelledFormula.of(formula, atomicProps);
+    }
 
   }
+
+    public static LabelledFormula convertingFacade() {
+    // Sample data: Create a t1.png structure
+    Converter converter = new Converter();
+    TermPrimary termP0s = new TermPrimary();
+    termP0s.setName("p0s");
+    termP0s.setCharacter(0);
+
+
+    TermPrimary termP1s = new TermPrimary();
+    termP1s.setName("p1s");
+    termP1s.setCharacter(1);
+
+
+    TermPrimary termP2s = new TermPrimary();
+    termP2s.setName("p2s");
+    termP2s.setCharacter(2);
+
+    BinaryExpression gP0s = new BinaryExpression();
+    gP0s.setLeft(termP0s);
+    gP0s.setOperator("G");
+
+    BinaryExpression gP1s = new BinaryExpression();
+    gP1s.setLeft(termP1s);
+    gP1s.setOperator("G");
+
+    BinaryExpression gP2s = new BinaryExpression();
+    gP2s.setLeft(termP2s);
+    gP2s.setOperator("G");
+
+    BinaryExpression firstConjunction = new BinaryExpression();
+    firstConjunction.setLeft(gP0s);
+    firstConjunction.setRight(gP1s);
+    firstConjunction.setOperator("&&");
+
+    BinaryExpression finalConjunction = new BinaryExpression();
+    finalConjunction.setLeft(firstConjunction);
+    finalConjunction.setRight(gP2s);
+    finalConjunction.setOperator("&&");
+
+
+    LTLDefinition ltlDefinition = new LTLDefinition();
+    ltlDefinition.setExpression(finalConjunction);
+    ltlDefinition.setName("Safety");
+
+
+    // Create a BinaryExpression for G(p1)
+//    BinaryExpression innerBinaryExpr = new BinaryExpression();
+//    innerBinaryExpr.setLeft(termP1);
+//    innerBinaryExpr.setOperator("G");
+//    innerBinaryExpr.setCharacter(2);
+//
+//    // Create a BinaryExpression for p0 && G(p1)
+//    BinaryExpression outerBinaryExpr = new BinaryExpression();
+//    outerBinaryExpr.setLeft(termP0);
+//    outerBinaryExpr.setRight(innerBinaryExpr);
+//    outerBinaryExpr.setOperator("&&");
+//    outerBinaryExpr.setCharacter(3);
+//
+//    // Create LTLDefinition
+//    LTLDefinition ltlDefinition = new LTLDefinition();
+//    ltlDefinition.setExpression(outerBinaryExpr);
+//    ltlDefinition.setName("Safety");
+
+
+    // Convert LTLDefinition to LabelledFormula
+    LabelledFormula labelledFormula = converter.convertToLabelledFormula(ltlDefinition);
+
+    return labelledFormula;
+  }
+
+
 
   //    // Function to parse LTLDefinition into a LabelledFormula
   //  public static LabelledFormula parseLtlDefinitionToLabelledFormula(LTLDefinition ltlDefinition) {
@@ -869,7 +943,7 @@ final class Mixins {
     //  //mapper.readValue(new File(filePath), LTLDefinition.class);
     //  System.out.println(ltlDefinition);
 
-     System.out.println("ObjectMapper function 7\n ***\n");
+     System.out.println("ObjectMapper function 10\n ***\n");
     return null;
     //  return Stream.of(parseLtlDefinitionToLabelledFormula(ltlDefinition));
    }
@@ -880,13 +954,14 @@ final class Mixins {
 
        // Parse the JSON and create the LabelledFormula object
        Stream<LabelledFormula> labelledFormulas = parseLtlDefinitionFromJson(filePath);
-
+       LabelledFormula labelledFormula = convertingFacade();
        // Print the LabelledFormula object(s)
       //  labelledFormulas.forEach(System.out::println);
+      System.out.print(labelledFormula);
 
      } catch (IOException e) {
        e.printStackTrace();
-     }
+     }  
     }
 
 
