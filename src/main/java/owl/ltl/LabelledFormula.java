@@ -26,6 +26,9 @@ import java.util.List;
 import owl.collections.Collections3;
 import owl.ltl.visitors.PrintVisitor;
 
+import java.util.BitSet;
+import java.util.stream.Collectors;
+
 @AutoValue
 public abstract class LabelledFormula {
   public abstract List<String> atomicPropositions();
@@ -61,5 +64,11 @@ public abstract class LabelledFormula {
   @Override
   public String toString() {
     return PrintVisitor.toString(this, true);
+  }
+
+  public static List<String> bitSetToStrings(BitSet bitSet) {
+    return bitSet.stream()
+            .mapToObj(i -> "p" + i)
+            .collect(Collectors.toList());
   }
 }
