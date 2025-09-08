@@ -236,11 +236,18 @@ final class Mixins {
               "source=" + source +
               '}';
     }
-    
+
     @ArgGroup
     private Source source = null;
 
     private static final class Source {
+
+      @Override
+      public String toString() {
+        return "Source{" +
+                "formula=" + Arrays.toString(formula) +
+                '}';
+      }
 
       @Option(
         names = {"-f", "--formula"},
@@ -302,6 +309,9 @@ final class Mixins {
       return stringSource().map((String line) -> {
         try {
           return LtlParser.parse(line);
+          //var test = LtlParser.parse(line);
+          // var testing = convertingFacade();
+          // return testing;
         } catch (RecognitionException | ParseCancellationException ex) {
           throw new IllegalArgumentException(line, ex);
         }
@@ -332,7 +342,403 @@ final class Mixins {
   }
   // changin
 
-  
+    public static class LTLDefinition {
+
+    protected Expression expression;
+    protected String name;
+
+    public Expression getExpression() {
+      return expression;
+    }
+
+    public void setExpression(Expression value) {
+      this.expression = value;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String value) {
+      this.name = value;
+    }
+  }
+
+    public static class BinaryExpression
+          extends Expression
+  {
+
+    protected Expression left;
+    protected Expression right;
+    protected String operator;
+
+    public Expression getLeft() {
+      return left;
+    }
+
+    public void setLeft(Expression value) {
+      this.left = value;
+    }
+
+    public Expression getRight() {
+      return right;
+    }
+
+    public void setRight(Expression value) {
+      this.right = value;
+    }
+
+    public String getOperator() {
+      return operator;
+    }
+
+    public void setOperator(String value) {
+      this.operator = value;
+    }
+
+  }
+
+    public static class TermPrimary
+          extends PrimaryExpression
+  {
+
+    protected Label label;
+    protected ParentSuffixPrimary parentSuffixPrimary;
+    protected List<Expression> indices;
+    protected String name;
+
+    public Label getLabel() {
+      return label;
+    }
+
+    public void setLabel(Label value) {
+      this.label = value;
+    }
+
+    public ParentSuffixPrimary getParentSuffixPrimary() {
+      return parentSuffixPrimary;
+    }
+
+    public void setParentSuffixPrimary(ParentSuffixPrimary value) {
+      this.parentSuffixPrimary = value;
+    }
+
+    public List<Expression> getIndices() {
+      if (indices == null) {
+        indices = new ArrayList<Expression>();
+      }
+      return this.indices;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String value) {
+      this.name = value;
+    }
+
+  }
+
+    public static class Expression
+          extends Statement
+  {
+
+    protected Type type;
+
+    public Type getType() {
+      return type;
+    }
+
+    public void setType(Type value) {
+      this.type = value;
+    }
+
+  }
+
+  public static class PrimaryExpression
+          extends Expression
+  {
+
+
+  }
+
+    public static class Label {
+
+    protected String name;
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String value) {
+      this.name = value;
+    }
+
+  }
+
+
+    public static class ParentSuffixPrimary {
+
+    protected List<Expression> arguments;
+    protected Integer lineNumber;
+    protected Integer character;
+
+    public List<Expression> getArguments() {
+      if (arguments == null) {
+        arguments = new ArrayList<Expression>();
+      }
+      return this.arguments;
+    }
+
+    public Integer getLineNumber() {
+      return lineNumber;
+    }
+
+    public void setLineNumber(Integer value) {
+      this.lineNumber = value;
+    }
+
+
+    public Integer getCharacter() {
+      return character;
+    }
+
+
+    public void setCharacter(Integer value) {
+      this.character = value;
+    }
+
+  }
+
+
+    public static class Type {
+
+//    protected AbstractTypeSystem typeSystem;
+    protected Integer lineNumber;
+    protected Integer character;
+
+//    public AbstractTypeSystem getTypeSystem() {
+//      return typeSystem;
+//    }
+//
+//    public void setTypeSystem(AbstractTypeSystem value) {
+//      this.typeSystem = value;
+//    }
+
+    public Integer getLineNumber() {
+      return lineNumber;
+    }
+
+    public void setLineNumber(Integer value) {
+      this.lineNumber = value;
+    }
+
+    public Integer getCharacter() {
+      return character;
+    }
+
+    public void setCharacter(Integer value) {
+      this.character = value;
+    }
+
+    public String getTypeName() {
+      return "General-Type";
+    }
+
+    public boolean canTypeCastTo(Type target) {
+      return this.canTypeUpCastTo(target) || canTypeDownCastTo(target);
+    }
+
+    public boolean canTypeDownCastTo(Type target) {
+      return target.canTypeUpCastTo(this);
+    }
+
+    public boolean canTypeUpCastTo(Type target) {
+      return false;
+    }
+
+    public static Comparator<Type> getCastableComparator() {
+      return new Comparator<Type>() {
+        public int compare(Type base, Type target) {
+          if (!base.canTypeUpCastTo(target))
+            return 1;
+          return 0;
+        }
+      };
+    }
+
+    public static Comparator<Type> getExactComparator() {
+      return new Comparator<Type>() {
+        public int compare(Type base, Type target) {
+          if (base instanceof OrdinaryPrimitiveType) {
+            if (base != target)
+              return 1;
+          } else if (base instanceof ArrayType) {
+            if (!base.canTypeUpCastTo(target))
+              return 1;
+            ArrayType baseArrayType = (ArrayType) base;
+            ArrayType targetArrayType = (ArrayType) target;
+            if (baseArrayType.getOrdinaryPrimitiveType() != targetArrayType
+                    .getOrdinaryPrimitiveType()) {
+              return 1;
+            }
+          }
+          return 0;
+        }
+      };
+    }
+
+  }
+
+  public static class OrdinaryPrimitiveType
+          extends Type
+  {
+
+    protected String name;
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String value) {
+      this.name = value;
+    }
+
+    @Override
+    public String getTypeName() {
+      return this.getName();
+    }
+
+
+  }
+
+  public static class ArrayType
+          extends Type
+  {
+
+    protected List<Integer> dimensions;
+    protected OrdinaryPrimitiveType ordinaryPrimitiveType;
+
+    public List<Integer> getDimensions() {
+      if (dimensions == null) {
+        dimensions = new ArrayList<Integer>();
+      }
+      return this.dimensions;
+    }
+
+    public OrdinaryPrimitiveType getOrdinaryPrimitiveType() {
+      return ordinaryPrimitiveType;
+    }
+
+    public void setOrdinaryPrimitiveType(OrdinaryPrimitiveType value) {
+      this.ordinaryPrimitiveType = value;
+    }
+
+    @Override
+    public String getTypeName() {
+      String retValueSuffix = "";
+      for (int dimention : this.getDimensions())
+        retValueSuffix += "[" + (dimention == 0 ? "" : dimention) + "]";
+      return this.getOrdinaryPrimitiveType().getTypeName() + retValueSuffix;
+    }
+
+//    public boolean canTypeUpCastTo(Type target) {
+//      if (!(target instanceof ArrayType))
+//        return false;
+//      ArrayType aBase = (ArrayType) this;
+//      ArrayType aTarget = (ArrayType) target;
+//      if (aTarget.getDimensions().size() != aBase.getDimensions().size())
+//        return false;
+//      for (int cnt = 0; cnt < aTarget.getDimensions().size(); cnt++)
+//        if (aTarget.getDimensions().get(cnt) != aBase.getDimensions().get(cnt))
+//          return false;
+//      target = aTarget.getOrdinaryPrimitiveType();
+//      return this.getOrdinaryPrimitiveType().canTypeUpCastTo(aTarget.getOrdinaryPrimitiveType());
+//    }
+
+  }
+
+
+    public static class Annotation {
+
+    protected Expression value;
+    protected String identifier;
+    protected Integer lineNumber;
+    protected Integer character;
+
+    public Expression getValue() {
+      return value;
+    }
+
+    public void setValue(Expression value) {
+      this.value = value;
+    }
+
+    public String getIdentifier() {
+      return identifier;
+    }
+
+    public void setIdentifier(String value) {
+      this.identifier = value;
+    }
+
+    public Integer getLineNumber() {
+      return lineNumber;
+    }
+
+    public void setLineNumber(Integer value) {
+      this.lineNumber = value;
+    }
+
+    public Integer getCharacter() {
+      return character;
+    }
+
+    public void setCharacter(Integer value) {
+      this.character = value;
+    }
+
+  }
+
+
+    public static class Statement {
+
+    protected Integer lineNumber;
+    protected Integer character;
+    protected List<Annotation> annotations;
+
+    public List<Annotation> getAnnotations() {
+      if (annotations == null) {
+        annotations = new ArrayList<Annotation>();
+      }
+      return this.annotations;
+    }
+
+    public Integer getLineNumber() {
+      return lineNumber;
+    }
+
+    public void setLineNumber(Integer value) {
+      this.lineNumber = value;
+    }
+
+    public Integer getCharacter() {
+      return character;
+    }
+
+    public void setCharacter(Integer value) {
+      this.character = value;
+    }
+
+  }
+
+
+// End: changin
+
+
+
+
 
 
 //  class LTLDefinition {
@@ -463,7 +869,7 @@ final class Mixins {
     //  //mapper.readValue(new File(filePath), LTLDefinition.class);
     //  System.out.println(ltlDefinition);
 
-     System.out.println("ObjectMapper function 2\n ***\n");
+     System.out.println("ObjectMapper function 7\n ***\n");
     return null;
     //  return Stream.of(parseLtlDefinitionToLabelledFormula(ltlDefinition));
    }
