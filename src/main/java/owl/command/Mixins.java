@@ -22,6 +22,13 @@ package owl.command;
 import static owl.thirdparty.picocli.CommandLine.ArgGroup;
 import static owl.thirdparty.picocli.CommandLine.Option;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.UncheckedExecutionException;
@@ -86,7 +93,7 @@ import static owl.thirdparty.picocli.CommandLine.Option;
 
 
 @SuppressWarnings("PMD.ImmutableField")
-final class Mixins {
+public final class Mixins {
 
   private Mixins() {}
 
@@ -344,6 +351,31 @@ final class Mixins {
   }
   // changin
 
+  public static class Root {
+
+    private List<LTLDefinition> definitions;
+    private List<Object> assertionDefinitions;
+
+    public Root() {
+    }
+
+    public List<LTLDefinition> getDefinitions() {
+      return definitions;
+    }
+
+    public void setDefinitions(List<LTLDefinition> definitions) {
+      this.definitions = definitions;
+    }
+
+    public List<Object> getAssertionDefinitions() {
+      return assertionDefinitions;
+    }
+
+    public void setAssertionDefinitions(List<Object> assertionDefinitions) {
+      this.assertionDefinitions = assertionDefinitions;
+    }
+  }
+
     public static class LTLDefinition {
 
     protected Expression expression;
@@ -364,6 +396,8 @@ final class Mixins {
     public void setName(String value) {
       this.name = value;
     }
+
+    public LTLDefinition() {}
   }
 
     public static class BinaryExpression
@@ -373,6 +407,51 @@ final class Mixins {
     protected Expression left;
     protected Expression right;
     protected String operator;
+    protected List<Annotation> annotations;
+
+    public List<Annotation> getAnnotations() {
+      if (annotations == null) {
+        annotations = new ArrayList<Annotation>();
+      }
+      return this.annotations;
+    }
+
+    public void setAnnotations(List<Annotation> annotations) {
+      this.annotations = annotations;
+    }
+
+    public Expression getRight() {
+      return right;
+    }
+
+    public void setRight(Expression value) {
+      this.right = value;
+    }
+
+    public Expression getLeft() {
+      return left;
+    }
+
+    public void setLeft(Expression left) {
+      this.left = left;
+    }
+
+    public String getOperator() {
+      return operator;
+    }
+
+    public void setOperator(String value) {
+      this.operator = value;
+    }
+
+  }
+
+  public static class DotPrimary
+          extends Expression
+  {
+
+    protected Expression left;
+    protected Expression right;
 
     public Expression getLeft() {
       return left;
@@ -390,6 +469,23 @@ final class Mixins {
       this.right = value;
     }
 
+  }
+
+  public static class UnaryExpression
+          extends Expression
+  {
+
+    protected Expression expression;
+    protected String operator;
+
+    public Expression getExpression() {
+      return expression;
+    }
+
+    public void setExpression(Expression expression) {
+      this.expression = expression;
+    }
+
     public String getOperator() {
       return operator;
     }
@@ -400,14 +496,68 @@ final class Mixins {
 
   }
 
+  public static class TypeInfo {
+    protected String name;
+    protected Type type;
+
+    public TypeInfo() {
+    }
+
+    public Type getType() {
+      return type;
+    }
+
+    public void setType(Type type) {
+      this.type = type;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+  }
+
     public static class TermPrimary
-          extends PrimaryExpression
+          extends Expression
   {
 
     protected Label label;
     protected ParentSuffixPrimary parentSuffixPrimary;
     protected List<Expression> indices;
     protected String name;
+    protected Type type;
+    protected TypeInfo typeInfo;
+    protected List<Annotation> annotations;
+
+    public List<Annotation> getAnnotations() {
+      if (annotations == null) {
+        annotations = new ArrayList<Annotation>();
+      }
+      return this.annotations;
+    }
+
+    public void setAnnotations(List<Annotation> annotations) {
+      this.annotations = annotations;
+    }
+
+    public Type getType() {
+      return type;
+    }
+
+    public void setType(Type value) {
+      this.type = value;
+    }
+
+    public TypeInfo getTypeInfo() {
+      return typeInfo;
+    }
+
+    public void setTypeInfo(TypeInfo typeInfo) {
+      this.typeInfo = typeInfo;
+    }
 
     public Label getLabel() {
       return label;
@@ -432,6 +582,10 @@ final class Mixins {
       return this.indices;
     }
 
+    public void setIndices(List<Expression> indices) {
+      this.indices = indices;
+    }
+
     public String getName() {
       return name;
     }
@@ -442,10 +596,24 @@ final class Mixins {
 
   }
 
+
+  @JsonTypeInfo(
+          use = JsonTypeInfo.Id.NAME,
+          include = JsonTypeInfo.As.PROPERTY,
+          property = "type"
+  )
+  @JsonSubTypes({
+          @JsonSubTypes.Type(value = DotPrimary.class, name = "DotPrimary"),
+          @JsonSubTypes.Type(value = UnaryExpression.class, name = "UnaryExpression"),
+          @JsonSubTypes.Type(value = BinaryExpression.class, name = "BinaryExpression"),
+          @JsonSubTypes.Type(value = TermPrimary.class, name = "TermPrimary"),
+  })
     public static class Expression
           extends Statement
   {
 
+    public Expression() {
+    }
     protected Type type;
 
     public Type getType() {
@@ -465,9 +633,13 @@ final class Mixins {
 
   }
 
+  @JsonDeserialize(using = LabelDeserializer.class)
     public static class Label {
 
-    protected String name;
+      public Label() {
+      }
+
+      protected String name;
 
     public String getName() {
       return name;
@@ -486,7 +658,10 @@ final class Mixins {
     protected Integer lineNumber;
     protected Integer character;
 
-    public List<Expression> getArguments() {
+      public ParentSuffixPrimary() {
+      }
+
+      public List<Expression> getArguments() {
       if (arguments == null) {
         arguments = new ArrayList<Expression>();
       }
@@ -513,8 +688,14 @@ final class Mixins {
 
   }
 
-
+  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+  @JsonSubTypes({
+          @JsonSubTypes.Type(value = OrdinaryPrimitiveType.class, name = "OrdinaryPrimitiveType")
+  })
     public static class Type {
+
+      public Type() {
+      }
 
 //    protected AbstractTypeSystem typeSystem;
     protected Integer lineNumber;
@@ -597,6 +778,9 @@ final class Mixins {
           extends Type
   {
 
+    public OrdinaryPrimitiveType() {
+    }
+
     protected String name;
 
     public String getName() {
@@ -664,7 +848,10 @@ final class Mixins {
 
     public static class Annotation {
 
-    protected Expression value;
+      public Annotation() {
+      }
+
+      protected Expression value;
     protected String identifier;
     protected Integer lineNumber;
     protected Integer character;
@@ -706,18 +893,25 @@ final class Mixins {
 
     public static class Statement {
 
+      public Statement() {
+      }
     protected Integer lineNumber;
     protected Integer character;
     protected List<Annotation> annotations;
 
-    public List<Annotation> getAnnotations() {
+
+      public Object getAnnotations() {
       if (annotations == null) {
         annotations = new ArrayList<Annotation>();
       }
       return this.annotations;
     }
 
-    public Integer getLineNumber() {
+      public void setAnnotations(List<Annotation> annotations) {
+        this.annotations = annotations;
+      }
+
+      public Integer getLineNumber() {
       return lineNumber;
     }
 
@@ -737,54 +931,6 @@ final class Mixins {
 
 
 // End: changin
-
-
-
-
-
-
-//  class LTLDefinition {
-//    public Expression expression;
-//    public String name;
-//  }
-
-
-//  class Expression {
-//    public List<Object> annotations;
-//    public int lineNumber;
-//    public int character;
-//    public Object type;
-//    public Expression left;
-//    public Expression right;
-//    public String operator;
-//    public String label;
-//    public TermPrimary parentSuffixPrimary;
-//    public List<Object> indices;
-//    public String name;
-//  }
-
-
-//  class TermPrimary {
-//    public List<Argument> arguments;
-//    public int lineNumber;
-//    public int character;
-//    public Object type;
-//    public String label;
-//    public Object parentSuffixPrimary;
-//    public List<Object> indices;
-//    public String name;
-//  }
-
-//  class Argument {
-//    public List<Object> annotations;
-//    public int lineNumber;
-//    public int character;
-//    public Object type;
-//    public String label;
-//    public Object parentSuffixPrimary;
-//    public List<Object> indices;
-//    public String name;
-//  }
 
 
 
@@ -901,22 +1047,22 @@ final class Mixins {
 
 
     // Create a BinaryExpression for G(p1)
-//    BinaryExpression innerBinaryExpr = new BinaryExpression();
-//    innerBinaryExpr.setLeft(termP1);
-//    innerBinaryExpr.setOperator("G");
-//    innerBinaryExpr.setCharacter(2);
-//
-//    // Create a BinaryExpression for p0 && G(p1)
-//    BinaryExpression outerBinaryExpr = new BinaryExpression();
-//    outerBinaryExpr.setLeft(termP0);
-//    outerBinaryExpr.setRight(innerBinaryExpr);
-//    outerBinaryExpr.setOperator("&&");
-//    outerBinaryExpr.setCharacter(3);
-//
-//    // Create LTLDefinition
-//    LTLDefinition ltlDefinition = new LTLDefinition();
-//    ltlDefinition.setExpression(outerBinaryExpr);
-//    ltlDefinition.setName("Safety");
+   BinaryExpression innerBinaryExpr = new BinaryExpression();
+   innerBinaryExpr.setLeft(termP1s);
+   innerBinaryExpr.setOperator("G");
+   innerBinaryExpr.setCharacter(2);
+
+   // Create a BinaryExpression for p0 && G(p1)
+   BinaryExpression outerBinaryExpr = new BinaryExpression();
+   outerBinaryExpr.setLeft(termP0s);
+   outerBinaryExpr.setRight(innerBinaryExpr);
+   outerBinaryExpr.setOperator("&&");
+   outerBinaryExpr.setCharacter(3);
+
+   // Create LTLDefinition
+   LTLDefinition ltlDefinition1 = new LTLDefinition();
+   ltlDefinition1.setExpression(outerBinaryExpr);
+   ltlDefinition1.setName("Deadlock");
 
 
     // Convert LTLDefinition to LabelledFormula
@@ -927,42 +1073,56 @@ final class Mixins {
 
 
 
-  //    // Function to parse LTLDefinition into a LabelledFormula
-  //  public static LabelledFormula parseLtlDefinitionToLabelledFormula(LTLDefinition ltlDefinition) {
-  //    Formula formula = parseExpression(ltlDefinition.expression);
-  //    return new AutoValue_LabelledFormula(ltlDefinition.name, formula);
-  //  }
+   // Function to parse LTLDefinition into a LabelledFormula
+   public static Stream<LabelledFormula> parseLtlDefinitionToLabelledFormula(List<LTLDefinition> ltlDefinitions) {
+      Converter converter = new Converter();
+
+      Stream<LabelledFormula> labelledFormulas = ltlDefinitions.stream()
+          .map(d -> converter.convertToLabelledFormula(d));
+      return labelledFormulas;
+   }
 
    // Function to read and parse the LTLDefinition from JSON and return a stream of LabelledFormulas
-   public static Stream<LabelledFormula> parseLtlDefinitionFromJson(String filePath) throws IOException {
-    //  ObjectMapper mapper = new ObjectMapper();
-    //  LTLDefinition ltlDefinition;
-     
-     
+   public static List<LTLDefinition> parseLtlDefinitionFromJson(String filePath) throws IOException {
+      ObjectMapper mapper = new ObjectMapper();
 
-    //  //mapper.readValue(new File(filePath), LTLDefinition.class);
-    //  System.out.println(ltlDefinition);
+      Root root = mapper.readValue(new File(filePath), Root.class);
+      List<LTLDefinition> ltlDefinitions = root.getDefinitions();
+      //  ltlDefinitions.forEach(d -> System.out.println(d.getName()));
 
-     System.out.println("ObjectMapper function 10\n ***\n");
-    return null;
-    //  return Stream.of(parseLtlDefinitionToLabelledFormula(ltlDefinition));
+      return ltlDefinitions;
    }
    public static void rebeca_main() {
      try {
        // Path to your JSON file
-       String filePath = "ltlDefinition.json";
+        String filePath = "./ltlDefinition.json";
 
        // Parse the JSON and create the LabelledFormula object
-       Stream<LabelledFormula> labelledFormulas = parseLtlDefinitionFromJson(filePath);
-       LabelledFormula labelledFormula = convertingFacade();
-       // Print the LabelledFormula object(s)
-      //  labelledFormulas.forEach(System.out::println);
-      System.out.print(labelledFormula);
+       List<LTLDefinition>  ltlDefinitions = parseLtlDefinitionFromJson(filePath);
+       Stream<LabelledFormula> labelledFormulas = parseLtlDefinitionToLabelledFormula(ltlDefinitions);
 
+       labelledFormulas.forEach(System.out::println);
      } catch (IOException e) {
        e.printStackTrace();
      }  
     }
+
+  public static class LabelDeserializer extends JsonDeserializer<Label> {
+    @Override
+    public Label deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+      JsonNode node = p.getCodec().readTree(p);
+
+      if (node.has("type") && "null".equals(node.get("type").asText())) {
+        return null;
+      }
+
+      Label label = new Label();
+      if (node.has("name")) {
+        label.setName(node.get("name").asText());
+      }
+      return label;
+    }
+  }
 
 
 

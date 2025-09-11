@@ -1,375 +1,89 @@
 {
-  "definitions": [
-    {
-      "name": "p0eat",
-      "expression": {
-        "type": "DotPrimary",
-        "left": {
-          "type": "TermPrimary",
-          "name": "phil0",
-          "label": {
-            "type": "Label",
-            "name": "environment-variable"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "Philosopher"
-          },
-          "annotations": [
-          ]
-        },
-        "right": {
-          "type": "TermPrimary",
-          "name": "eating",
-          "label": {
-            "type": "null"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "boolean"
-          },
-          "annotations": [
-          ]
-        }
-      }
-    },
-    {
-      "name": "p1eat",
-      "expression": {
-        "type": "DotPrimary",
-        "left": {
-          "type": "TermPrimary",
-          "name": "phil1",
-          "label": {
-            "type": "Label",
-            "name": "environment-variable"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "Philosopher"
-          },
-          "annotations": [
-          ]
-        },
-        "right": {
-          "type": "TermPrimary",
-          "name": "eating",
-          "label": {
-            "type": "null"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "boolean"
-          },
-          "annotations": [
-          ]
-        }
-      }
-    },
-    {
-      "name": "p2eat",
-      "expression": {
-        "type": "DotPrimary",
-        "left": {
-          "type": "TermPrimary",
-          "name": "phil2",
-          "label": {
-            "type": "Label",
-            "name": "environment-variable"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "Philosopher"
-          },
-          "annotations": [
-          ]
-        },
-        "right": {
-          "type": "TermPrimary",
-          "name": "eating",
-          "label": {
-            "type": "null"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "boolean"
-          },
-          "annotations": [
-          ]
-        }
-      }
-    },
-    {
-      "name": "p0fR",
-      "expression": {
-        "type": "DotPrimary",
-        "left": {
-          "type": "TermPrimary",
-          "name": "phil0",
-          "label": {
-            "type": "Label",
-            "name": "environment-variable"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "Philosopher"
-          },
-          "annotations": [
-          ]
-        },
-        "right": {
-          "type": "TermPrimary",
-          "name": "fR",
-          "label": {
-            "type": "null"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "boolean"
-          },
-          "annotations": [
-          ]
-        }
-      }
-    },
-    {
-      "name": "p1fR",
-      "expression": {
-        "type": "DotPrimary",
-        "left": {
-          "type": "TermPrimary",
-          "name": "phil1",
-          "label": {
-            "type": "Label",
-            "name": "environment-variable"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "Philosopher"
-          },
-          "annotations": [
-          ]
-        },
-        "right": {
-          "type": "TermPrimary",
-          "name": "fR",
-          "label": {
-            "type": "null"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "boolean"
-          },
-          "annotations": [
-          ]
-        }
-      }
-    },
-    {
-      "name": "p2fR",
-      "expression": {
-        "type": "DotPrimary",
-        "left": {
-          "type": "TermPrimary",
-          "name": "phil2",
-          "label": {
-            "type": "Label",
-            "name": "environment-variable"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "Philosopher"
-          },
-          "annotations": [
-          ]
-        },
-        "right": {
-          "type": "TermPrimary",
-          "name": "fR",
-          "label": {
-            "type": "null"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "boolean"
-          },
-          "annotations": [
-          ]
-        }
-      }
-    },
-    {
-      "name": "p0fL",
-      "expression": {
-        "type": "DotPrimary",
-        "left": {
-          "type": "TermPrimary",
-          "name": "phil0",
-          "label": {
-            "type": "Label",
-            "name": "environment-variable"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "Philosopher"
-          },
-          "annotations": [
-          ]
-        },
-        "right": {
-          "type": "TermPrimary",
-          "name": "fL",
-          "label": {
-            "type": "null"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "boolean"
-          },
-          "annotations": [
-          ]
-        }
-      }
-    },
-    {
-      "name": "p1fL",
-      "expression": {
-        "type": "DotPrimary",
-        "left": {
-          "type": "TermPrimary",
-          "name": "phil1",
-          "label": {
-            "type": "Label",
-            "name": "environment-variable"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "Philosopher"
-          },
-          "annotations": [
-          ]
-        },
-        "right": {
-          "type": "TermPrimary",
-          "name": "fL",
-          "label": {
-            "type": "null"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "boolean"
-          },
-          "annotations": [
-          ]
-        }
-      }
-    },
-    {
-      "name": "p2fL",
-      "expression": {
-        "type": "DotPrimary",
-        "left": {
-          "type": "TermPrimary",
-          "name": "phil2",
-          "label": {
-            "type": "Label",
-            "name": "environment-variable"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "Philosopher"
-          },
-          "annotations": [
-          ]
-        },
-        "right": {
-          "type": "TermPrimary",
-          "name": "fL",
-          "label": {
-            "type": "null"
-          },
-          "indices": [
-          ],
-          "typeInfo": {
-            "type": "OrdinaryPrimitiveType",
-            "name": "boolean"
-          },
-          "annotations": [
-          ]
-        }
-      }
-    },
-    {
-      "name": "p0s",
-      "expression": {
-        "type": "UnaryExpression",
-        "operator": "!",
+      "definitions": [
+        {
+        "name": "Safety",
         "expression": {
-          "type": "BinaryExpression",
-          "operator": "&&",
-          "annotations": "[]"
+            "type": "BinaryExpression",
+            "operator": "&&",
+            "left": {
+            "type": "BinaryExpression",
+            "operator": "&&",
+            "left": {
+                "type": "BinaryExpression",
+                "operator": "G",
+                "left": {
+                "type": "TermPrimary",
+                "name": "p0s",
+                "character": 0
+                },
+                "right": null
+            },
+            "right": {
+                "type": "BinaryExpression",
+                "operator": "G",
+                "left": {
+                "type": "TermPrimary",
+                "name": "p1s",
+                "character": 1
+                },
+                "right": null
+            }
+            },
+            "right": {
+            "type": "BinaryExpression",
+            "operator": "G",
+            "left": {
+                "type": "TermPrimary",
+                "name": "p2s",
+                "character": 2
+                },
+            "right": null
+            }
         }
-      }
-    },
-    {
-      "name": "p1s",
-      "expression": {
-        "type": "UnaryExpression",
-        "operator": "!",
+        },
+                {
+        "name": "Safety",
         "expression": {
-          "type": "BinaryExpression",
-          "operator": "&&",
-          "annotations": "[]"
+            "type": "BinaryExpression",
+            "operator": "&&",
+            "left": {
+            "type": "BinaryExpression",
+            "operator": "||",
+            "left": {
+                "type": "BinaryExpression",
+                "operator": "G",
+                "left": {
+                "type": "TermPrimary",
+                "name": "p0s",
+                "character": 0
+                },
+                "right": null
+            },
+            "right": {
+                "type": "BinaryExpression",
+                "operator": "F",
+                "left": {
+                "type": "TermPrimary",
+                "name": "p1s",
+                "character": 1
+                },
+                "right": null
+            }
+            },
+            "right": {
+            "type": "BinaryExpression",
+            "operator": "F",
+            "left": {
+                "type": "TermPrimary",
+                "name": "p2s",
+                "character": 2
+                },
+            "right": null
+            }
         }
-      }
-    },
-    {
-      "name": "p2s",
-      "expression": {
-        "type": "UnaryExpression",
-        "operator": "!",
-        "expression": {
-          "type": "BinaryExpression",
-          "operator": "&&",
-          "annotations": "[]"
         }
-      }
-    }
-  ],
-  "assertionDefinitions": [
-  ]
+      ],
+      "assertionDefinitions": [
+      ]
 }
+
