@@ -1,0 +1,72 @@
+{
+      "definitions": [
+        {
+        "name": "Safety",
+        "expression": {
+            "type": "BinaryExpression",
+            "operator": "&&",
+            "left": {
+            "type": "BinaryExpression",
+            "operator": "&&",
+            "left": {
+                "type": "BinaryExpression",
+                "operator": "G",
+                "left": {
+                "type": "TermPrimary",
+                "name": "p0s",
+                "character": 0
+                },
+                "right": null
+            },
+            "right": {
+                "type": "BinaryExpression",
+                "operator": "G",
+                "left": {
+                "type": "TermPrimary",
+                "name": "p1s",
+                "character": 1
+                },
+                "right": null
+            }
+            },
+            "right": {
+            "type": "BinaryExpression",
+            "operator": "G",
+            "left": {
+                "type": "TermPrimary",
+                "name": "p2s",
+                "character": 2
+                },
+            "right": null
+            }
+        }
+        },
+        {
+        "name": "Deadlock",
+        "expression": {
+            "type": "BinaryExpression",
+            "left": {
+            "type": "TermPrimary",
+            "name": "p0s",
+            "character": 0
+            },
+            "right": {
+            "type": "BinaryExpression",
+            "left": {
+                "type": "TermPrimary",
+                "name": "p1s",
+                "character": 1
+            },
+            "right": null,
+            "operator": "G",
+            "character": 2
+            },
+            "operator": "&&",
+            "character": 3
+        }
+        }
+      ],
+      "assertionDefinitions": [
+      ]
+}
+

@@ -319,37 +319,14 @@ public final class Mixins {
       return stringSource().map((String line) -> {
         try {
           // return LtlParser.parse(line);
-          // var test = LtlParser.parse(line);
           return convertingFacade();
         } catch (RecognitionException | ParseCancellationException ex) {
           throw new IllegalArgumentException(line, ex);
         }
       });
     }
-
-    // new
-    public static LabelledFormula createExampleLabelledFormula() {
-
-     List<String> atomicPropositions = List.of("a", "b");
-
-     Literal p0 = new Literal(0); // "p0" -> "a"
-
-     // Gp1
-     Literal p1 = new Literal(1); // "p1" represents "b"
-     GOperator Gp1 = new GOperator(p1); // G(b)
-
-     // conjunction formula (p0 & Gp1)
-     Conjunction conjunction = new Conjunction(List.of(p0, Gp1));
-
-     // FOperator formula (F(p0 & Gp1))
-     FOperator fOperator = new FOperator(conjunction);
-
-     return LabelledFormula.of(fOperator, atomicPropositions);
-   }
-
-   // /new
   }
-  // changin
+  
 
   public static class Root {
 
@@ -697,17 +674,9 @@ public final class Mixins {
       public Type() {
       }
 
-//    protected AbstractTypeSystem typeSystem;
     protected Integer lineNumber;
     protected Integer character;
 
-//    public AbstractTypeSystem getTypeSystem() {
-//      return typeSystem;
-//    }
-//
-//    public void setTypeSystem(AbstractTypeSystem value) {
-//      this.typeSystem = value;
-//    }
 
     public Integer getLineNumber() {
       return lineNumber;
@@ -828,21 +797,6 @@ public final class Mixins {
         retValueSuffix += "[" + (dimention == 0 ? "" : dimention) + "]";
       return this.getOrdinaryPrimitiveType().getTypeName() + retValueSuffix;
     }
-
-//    public boolean canTypeUpCastTo(Type target) {
-//      if (!(target instanceof ArrayType))
-//        return false;
-//      ArrayType aBase = (ArrayType) this;
-//      ArrayType aTarget = (ArrayType) target;
-//      if (aTarget.getDimensions().size() != aBase.getDimensions().size())
-//        return false;
-//      for (int cnt = 0; cnt < aTarget.getDimensions().size(); cnt++)
-//        if (aTarget.getDimensions().get(cnt) != aBase.getDimensions().get(cnt))
-//          return false;
-//      target = aTarget.getOrdinaryPrimitiveType();
-//      return this.getOrdinaryPrimitiveType().canTypeUpCastTo(aTarget.getOrdinaryPrimitiveType());
-//    }
-
   }
 
 
@@ -851,7 +805,7 @@ public final class Mixins {
       public Annotation() {
       }
 
-      protected Expression value;
+    protected Expression value;
     protected String identifier;
     protected Integer lineNumber;
     protected Integer character;
@@ -928,13 +882,6 @@ public final class Mixins {
     }
 
   }
-
-
-// End: changin
-
-
-
-
 
 
   public static class Converter {
@@ -1066,7 +1013,10 @@ public final class Mixins {
 
 
     // Convert LTLDefinition to LabelledFormula
+    // List<LabelledFormula> labelledFormulas;
     LabelledFormula labelledFormula = converter.convertToLabelledFormula(ltlDefinition);
+    // labelledFormulas.add(labelledFormula);
+
 
     return labelledFormula;
   }
@@ -1076,10 +1026,8 @@ public final class Mixins {
    // Function to parse LTLDefinition into a LabelledFormula
    public static Stream<LabelledFormula> parseLtlDefinitionToLabelledFormula(List<LTLDefinition> ltlDefinitions) {
       Converter converter = new Converter();
-
-      Stream<LabelledFormula> labelledFormulas = ltlDefinitions.stream()
+      return ltlDefinitions.stream()
           .map(d -> converter.convertToLabelledFormula(d));
-      return labelledFormulas;
    }
 
    // Function to read and parse the LTLDefinition from JSON and return a stream of LabelledFormulas
@@ -1087,24 +1035,17 @@ public final class Mixins {
       ObjectMapper mapper = new ObjectMapper();
 
       Root root = mapper.readValue(new File(filePath), Root.class);
-      List<LTLDefinition> ltlDefinitions = root.getDefinitions();
-      //  ltlDefinitions.forEach(d -> System.out.println(d.getName()));
-
-      return ltlDefinitions;
+      return root.getDefinitions();
    }
-   public static void rebeca_main() {
+   public static Stream<LabelledFormula> rebecaToLTL(String filePath) {
      try {
-       // Path to your JSON file
-        String filePath = "./ltlDefinition.json";
-
        // Parse the JSON and create the LabelledFormula object
        List<LTLDefinition>  ltlDefinitions = parseLtlDefinitionFromJson(filePath);
-       Stream<LabelledFormula> labelledFormulas = parseLtlDefinitionToLabelledFormula(ltlDefinitions);
-
-       labelledFormulas.forEach(System.out::println);
+       return parseLtlDefinitionToLabelledFormula(ltlDefinitions);
      } catch (IOException e) {
        e.printStackTrace();
      }  
+     return null;
     }
 
   public static class LabelDeserializer extends JsonDeserializer<Label> {
