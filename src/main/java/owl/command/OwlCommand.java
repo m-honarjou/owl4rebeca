@@ -53,6 +53,7 @@ import owl.thirdparty.picocli.CommandLine.Model.CommandSpec;
            LtlTranslationCommands.Ltl2DraCommand.class,
            LtlTranslationCommands.Ltl2DgraCommand.class,
            LtlTranslationCommands.Ltl2DelaCommand.class,
+          //  LtlTranslationCommands.RebecaLtl2DraCommand.class,
 
            // LTL Conversion Commands
            LtlConversionCommands.Delta2Normalisation.class,
@@ -94,12 +95,13 @@ public final class OwlCommand extends AbstractOwlCommand {
   }
 
   public static void main(String[] args) {
-    if("rebeca2ltl".equals(args[0]))
-      Mixins.rebecaToLTL(args[1]).forEach(System.out::println);
-    else  
-      System.exit(new CommandLine(new OwlCommand(args))
-        .setExecutionExceptionHandler(new ExecutionExceptionHandler())
-        .execute(args));
+    Mixins.rebecaToLTL(args[1]);
+    // if("rebeca2ltl".equals(args[0]))
+    //   Mixins.rebecaToLTL(args[1]).forEach(System.out::println);
+    // else  
+    //   System.exit(new CommandLine(new OwlCommand(args))
+    //     .setExecutionExceptionHandler(new ExecutionExceptionHandler())
+    //     .execute(args));
   }
 
   @Override

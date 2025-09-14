@@ -89,8 +89,28 @@ import java.util.stream.Stream;
 import static owl.thirdparty.picocli.CommandLine.ArgGroup;
 import static owl.thirdparty.picocli.CommandLine.Option;
 
-// import owl.ltl.Formula;
 
+import org.rebecalang.compiler.CompilerConfig;
+import org.rebecalang.compiler.modelcompiler.RebecaModelCompiler;
+import org.rebecalang.compiler.modelcompiler.ScopeException;
+import org.rebecalang.compiler.modelcompiler.SymbolTable;
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.RebecaModel;
+import org.rebecalang.compiler.utils.CodeCompilationException;
+import org.rebecalang.compiler.utils.CompilerExtension;
+import org.rebecalang.compiler.utils.CoreVersion;
+import org.rebecalang.compiler.utils.ExceptionContainer;
+import org.rebecalang.compiler.utils.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.test.context.ContextConfiguration;
+// import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.rebecalang.compiler.propertycompiler.generalrebeca.objectmodel.AssertionDefinition;
+import org.rebecalang.compiler.propertycompiler.generalrebeca.objectmodel.Definition;
+import org.rebecalang.compiler.propertycompiler.generalrebeca.objectmodel.PropertyModel;
+// import org.rebecalang.compiler.propertycompiler.generalrebeca.objectmodel.PropertyCompiler;
+
+import java.util.Scanner;
+import org.rebecalang.compiler.propertycompiler.*;
 
 @SuppressWarnings("PMD.ImmutableField")
 public final class Mixins {
@@ -1023,6 +1043,181 @@ public final class Mixins {
 
 
 
+
+
+
+
+
+
+    
+    
+	private static void printExpressionDetails(org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.Expression expr, String indent) {
+		if (expr == null) {
+			System.out.println(indent + "\"type\": \"null\"");
+			return;
+		}
+		
+		System.out.println(indent + "\"type\": \"" + expr.getClass().getSimpleName() + "\",");
+		
+		if (expr instanceof org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.DotPrimary) {
+			org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.DotPrimary dotPrimary = (org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.DotPrimary) expr;
+			System.out.println(indent + "\"left\": {");
+			printExpressionDetails(dotPrimary.getLeft(), indent + "  ");
+			System.out.println(indent + "},");
+			System.out.println(indent + "\"right\": {");
+			printExpressionDetails(dotPrimary.getRight(), indent + "  ");
+			System.out.println(indent + "}");
+		} else if (expr instanceof org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.UnaryExpression) {
+			org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.UnaryExpression unaryExpr = (org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.UnaryExpression) expr;
+			System.out.println(indent + "\"operator\": \"" + unaryExpr.getOperator() + "\",");
+			System.out.println(indent + "\"expression\": {");
+			printExpressionDetails(unaryExpr.getExpression(), indent + "  ");
+			System.out.println(indent + "}");
+		} else if (expr instanceof org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.TermPrimary) {
+			org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.TermPrimary termPrimary = (org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.TermPrimary) expr;
+			System.out.println(indent + "\"name\": \"" + termPrimary.getName() + "\",");
+			
+			// Print label details
+			System.out.println(indent + "\"label\": {");
+			if (termPrimary.getLabel() != null) {
+				System.out.println(indent + "  \"type\": \"Label\",");
+				System.out.println(indent + "  \"name\": \"" + termPrimary.getLabel().getName() + "\"");
+			} else {
+				System.out.println(indent + "  \"type\": \"null\"");
+			}
+			System.out.println(indent + "},");
+			
+			// Print indices
+			System.out.println(indent + "\"indices\": [");
+			if (termPrimary.getIndices() != null && !termPrimary.getIndices().isEmpty()) {
+				for (int i = 0; i < termPrimary.getIndices().size(); i++) {
+					System.out.println(indent + "  {");
+					printExpressionDetails(termPrimary.getIndices().get(i), indent + "    ");
+					System.out.print(indent + "  }");
+					if (i < termPrimary.getIndices().size() - 1) {
+						System.out.println(",");
+					} else {
+						System.out.println();
+					}
+				}
+			}
+			System.out.println(indent + "],");
+			
+			// Print type information
+			System.out.println(indent + "\"typeInfo\": {");
+			if (termPrimary.getType() != null) {
+				System.out.println(indent + "  \"type\": \"" + termPrimary.getType().getClass().getSimpleName() + "\",");
+				if (termPrimary.getType() instanceof org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.OrdinaryPrimitiveType) {
+					org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.OrdinaryPrimitiveType ordType = 
+						(org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.OrdinaryPrimitiveType) termPrimary.getType();
+					System.out.println(indent + "  \"name\": \"" + ordType.getName() + "\"");
+				} else {
+					System.out.println(indent + "  \"details\": \"" + termPrimary.getType().toString() + "\"");
+				}
+			} else {
+				System.out.println(indent + "  \"type\": \"null\"");
+			}
+			System.out.println(indent + "},");
+			
+			// Print annotations
+			System.out.println(indent + "\"annotations\": [");
+			if (termPrimary.getAnnotations() != null && !termPrimary.getAnnotations().isEmpty()) {
+				for (int i = 0; i < termPrimary.getAnnotations().size(); i++) {
+					System.out.print(indent + "  \"" + termPrimary.getAnnotations().get(i) + "\"");
+					if (i < termPrimary.getAnnotations().size() - 1) {
+						System.out.println(",");
+					} else {
+						System.out.println();
+					}
+				}
+			}
+			System.out.println(indent + "]");
+		} else {
+			// For other expression types, try to get common properties
+			try {
+				java.lang.reflect.Method[] methods = expr.getClass().getMethods();
+				boolean hasProperties = false;
+				for (java.lang.reflect.Method method : methods) {
+					if (method.getName().startsWith("get") && method.getParameterCount() == 0 && 
+						!method.getName().equals("getClass") && !method.getName().equals("getLineNumber") && 
+						!method.getName().equals("getCharacter")) {
+						Object value = method.invoke(expr);
+						String propertyName = method.getName().substring(3).toLowerCase();
+						if (value instanceof String || value instanceof Number || value instanceof Boolean) {
+							if (hasProperties) System.out.println(",");
+							System.out.print(indent + "\"" + propertyName + "\": \"" + value + "\"");
+							hasProperties = true;
+						} else if (value != null && !value.toString().contains("@")) {
+							if (hasProperties) System.out.println(",");
+							System.out.print(indent + "\"" + propertyName + "\": \"" + value.toString() + "\"");
+							hasProperties = true;
+						}
+					}
+				}
+				if (hasProperties) System.out.println();
+			} catch (Exception e) {
+				System.out.println(indent + "\"details\": \"" + expr.toString() + "\"");
+			}
+		}
+	}
+
+  private static void printDetailedPropertyModelInformation(PropertyModel grammer){
+  		// Print detailed PropertyModel information
+		System.out.println("PropertyModel details:");
+		System.out.println("{");
+		System.out.println("  \"definitions\": [");
+		if (grammer.getDefinitions() != null) {
+			for (int i = 0; i < grammer.getDefinitions().size(); i++) {
+				org.rebecalang.compiler.propertycompiler.generalrebeca.objectmodel.Definition def = grammer.getDefinitions().get(i);
+				System.out.println("    {");
+				System.out.println("      \"name\": \"" + def.getName() + "\",");
+				System.out.println("      \"expression\": {");
+				printExpressionDetails(def.getExpression(), "        ");
+				System.out.println("      }");
+				System.out.print("    }");
+				if (i < grammer.getDefinitions().size() - 1) {
+					System.out.println(",");
+				} else {
+					System.out.println();
+				}
+			}
+		}
+		System.out.println("  ],");
+		System.out.println("  \"assertionDefinitions\": [");
+		if (grammer.getAssertionDefinitions() != null) {
+			for (int i = 0; i < grammer.getAssertionDefinitions().size(); i++) {
+				System.out.print("    " + grammer.getAssertionDefinitions().get(i));
+				if (i < grammer.getAssertionDefinitions().size() - 1) {
+					System.out.println(",");
+				} else {
+					System.out.println();
+				}
+			}
+		}
+		System.out.println("  ]");
+		System.out.println("}");
+
+
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    // Function to parse LTLDefinition into a LabelledFormula
    public static Stream<LabelledFormula> parseLtlDefinitionToLabelledFormula(List<LTLDefinition> ltlDefinitions) {
       Converter converter = new Converter();
@@ -1038,8 +1233,25 @@ public final class Mixins {
       return root.getDefinitions();
    }
    public static Stream<LabelledFormula> rebecaToLTL(String filePath) {
-     try {
-       // Parse the JSON and create the LabelledFormula object
+     try (var ctx = new AnnotationConfigApplicationContext(CompilerConfig.class)){
+      RebecaModelCompiler modelCompiler = ctx.getBean(RebecaModelCompiler.class);
+      PropertyCompiler propertyCompiler = ctx.getBean(PropertyCompiler.class);
+      ExceptionContainer exceptions     = ctx.getBean(ExceptionContainer.class);
+
+
+        File model = new File("DiningPhilosophers.rebeca");
+        File property = new File("DiningPhilosophers.property");
+
+        Set<CompilerExtension> extension = new HashSet<CompilerExtension>();
+        Pair<RebecaModel, SymbolTable> modelCompilatioResult = modelCompiler.compileRebecaFile(model, extension, CoreVersion.CORE_2_0);
+        
+        PropertyModel grammer = propertyCompiler.compilePropertyFile(property, modelCompilatioResult.getFirst(), extension);
+
+        
+
+        printDetailedPropertyModelInformation(grammer);
+
+
        List<LTLDefinition>  ltlDefinitions = parseLtlDefinitionFromJson(filePath);
        return parseLtlDefinitionToLabelledFormula(ltlDefinitions);
      } catch (IOException e) {

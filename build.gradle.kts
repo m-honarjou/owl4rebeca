@@ -45,6 +45,9 @@ val owlMainClass = "owl.command.OwlCommand"
 base {
     archivesName.set("owl")
 }
+// tasks.withType<Copy> {
+//     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+// }
 
 java {
     toolchain {
@@ -83,6 +86,7 @@ val staticNativeExecutable = project.hasProperty("static-native-executable")
 val enableNativeAssertions = project.hasProperty("enable-native-assertions")
 
 repositories {
+    mavenLocal()  
     mavenCentral()
 }
 
@@ -95,7 +99,7 @@ dependencies {
 
     // http://www.antlr.org/
     // https://mvnrepository.com/artifact/org.antlr/antlr4-runtime
-    implementation("org.antlr", "antlr4-runtime", "4.9.3")
+    implementation("org.antlr", "antlr4-runtime", "4.8")
 
     // https://www.graalvm.org/
     // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk
@@ -109,6 +113,13 @@ dependencies {
     implementation("com.fasterxml.jackson.module", "jackson-module-kotlin", "2.17.2")
     implementation("com.fasterxml.jackson.datatype", "jackson-datatype-jsr310", "2.17.2") // Java 8 Date/Time support
 
+    implementation("org.rebecalang:compiler:2.28")
+    // implementation("org.rebecalang", "compiler", "2.28")
+    // implementation("org.springframework:spring-context:5.3.39")
+    // implementation("org.springframework:spring-beans:5.3.39")÷
+    // implementation("org.springframework:spring-core:5.3.39")
+    // implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
+    // runtimeOnly("org.glassfish.jaxb:jaxb-runtime:4.0.5")
 
     // https://github.com/google/gson
     testImplementation("com.google.code.gson", "gson", "2.8.5")
@@ -386,6 +397,8 @@ distributions {
             from("AUTHORS")
             from("LICENSE")
             from(compileMarkdown)
+
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
             into("bin") {
                 from(buildKissat) {
