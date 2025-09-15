@@ -95,6 +95,8 @@ import org.rebecalang.compiler.modelcompiler.RebecaModelCompiler;
 import org.rebecalang.compiler.modelcompiler.ScopeException;
 import org.rebecalang.compiler.modelcompiler.SymbolTable;
 import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.RebecaModel;
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.*;
+
 import org.rebecalang.compiler.utils.CodeCompilationException;
 import org.rebecalang.compiler.utils.CompilerExtension;
 import org.rebecalang.compiler.utils.CoreVersion;
@@ -111,6 +113,19 @@ import org.rebecalang.compiler.propertycompiler.generalrebeca.objectmodel.Proper
 
 import java.util.Scanner;
 import org.rebecalang.compiler.propertycompiler.*;
+
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.Expression;
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.BinaryExpression;
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.UnaryExpression;
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.DotPrimary;
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.TermPrimary;
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.PrimaryExpression;
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.Literal;
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.TernaryExpression;
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.PlusSubExpression;
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.CastExpression;
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.InstanceofExpression;
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.NonDetExpression;
 
 @SuppressWarnings("PMD.ImmutableField")
 public final class Mixins {
@@ -338,718 +353,19 @@ public final class Mixins {
     Stream<LabelledFormula> source() throws IOException {
       return stringSource().map((String line) -> {
         try {
-          // return LtlParser.parse(line);
-          return convertingFacade();
+          return LtlParser.parse(line);
+          // return convertingFacade();
         } catch (RecognitionException | ParseCancellationException ex) {
           throw new IllegalArgumentException(line, ex);
         }
       });
     }
   }
-  
+ 
 
-  public static class Root {
 
-    private List<LTLDefinition> definitions;
-    private List<Object> assertionDefinitions;
 
-    public Root() {
-    }
 
-    public List<LTLDefinition> getDefinitions() {
-      return definitions;
-    }
-
-    public void setDefinitions(List<LTLDefinition> definitions) {
-      this.definitions = definitions;
-    }
-
-    public List<Object> getAssertionDefinitions() {
-      return assertionDefinitions;
-    }
-
-    public void setAssertionDefinitions(List<Object> assertionDefinitions) {
-      this.assertionDefinitions = assertionDefinitions;
-    }
-  }
-
-    public static class LTLDefinition {
-
-    protected Expression expression;
-    protected String name;
-
-    public Expression getExpression() {
-      return expression;
-    }
-
-    public void setExpression(Expression value) {
-      this.expression = value;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String value) {
-      this.name = value;
-    }
-
-    public LTLDefinition() {}
-  }
-
-    public static class BinaryExpression
-          extends Expression
-  {
-
-    protected Expression left;
-    protected Expression right;
-    protected String operator;
-    protected List<Annotation> annotations;
-
-    public List<Annotation> getAnnotations() {
-      if (annotations == null) {
-        annotations = new ArrayList<Annotation>();
-      }
-      return this.annotations;
-    }
-
-    public void setAnnotations(List<Annotation> annotations) {
-      this.annotations = annotations;
-    }
-
-    public Expression getRight() {
-      return right;
-    }
-
-    public void setRight(Expression value) {
-      this.right = value;
-    }
-
-    public Expression getLeft() {
-      return left;
-    }
-
-    public void setLeft(Expression left) {
-      this.left = left;
-    }
-
-    public String getOperator() {
-      return operator;
-    }
-
-    public void setOperator(String value) {
-      this.operator = value;
-    }
-
-  }
-
-  public static class DotPrimary
-          extends Expression
-  {
-
-    protected Expression left;
-    protected Expression right;
-
-    public Expression getLeft() {
-      return left;
-    }
-
-    public void setLeft(Expression value) {
-      this.left = value;
-    }
-
-    public Expression getRight() {
-      return right;
-    }
-
-    public void setRight(Expression value) {
-      this.right = value;
-    }
-
-  }
-
-  public static class UnaryExpression
-          extends Expression
-  {
-
-    protected Expression expression;
-    protected String operator;
-
-    public Expression getExpression() {
-      return expression;
-    }
-
-    public void setExpression(Expression expression) {
-      this.expression = expression;
-    }
-
-    public String getOperator() {
-      return operator;
-    }
-
-    public void setOperator(String value) {
-      this.operator = value;
-    }
-
-  }
-
-  public static class TypeInfo {
-    protected String name;
-    protected Type type;
-
-    public TypeInfo() {
-    }
-
-    public Type getType() {
-      return type;
-    }
-
-    public void setType(Type type) {
-      this.type = type;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String name) {
-      this.name = name;
-    }
-  }
-
-    public static class TermPrimary
-          extends Expression
-  {
-
-    protected Label label;
-    protected ParentSuffixPrimary parentSuffixPrimary;
-    protected List<Expression> indices;
-    protected String name;
-    protected Type type;
-    protected TypeInfo typeInfo;
-    protected List<Annotation> annotations;
-
-    public List<Annotation> getAnnotations() {
-      if (annotations == null) {
-        annotations = new ArrayList<Annotation>();
-      }
-      return this.annotations;
-    }
-
-    public void setAnnotations(List<Annotation> annotations) {
-      this.annotations = annotations;
-    }
-
-    public Type getType() {
-      return type;
-    }
-
-    public void setType(Type value) {
-      this.type = value;
-    }
-
-    public TypeInfo getTypeInfo() {
-      return typeInfo;
-    }
-
-    public void setTypeInfo(TypeInfo typeInfo) {
-      this.typeInfo = typeInfo;
-    }
-
-    public Label getLabel() {
-      return label;
-    }
-
-    public void setLabel(Label value) {
-      this.label = value;
-    }
-
-    public ParentSuffixPrimary getParentSuffixPrimary() {
-      return parentSuffixPrimary;
-    }
-
-    public void setParentSuffixPrimary(ParentSuffixPrimary value) {
-      this.parentSuffixPrimary = value;
-    }
-
-    public List<Expression> getIndices() {
-      if (indices == null) {
-        indices = new ArrayList<Expression>();
-      }
-      return this.indices;
-    }
-
-    public void setIndices(List<Expression> indices) {
-      this.indices = indices;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String value) {
-      this.name = value;
-    }
-
-  }
-
-
-  @JsonTypeInfo(
-          use = JsonTypeInfo.Id.NAME,
-          include = JsonTypeInfo.As.PROPERTY,
-          property = "type"
-  )
-  @JsonSubTypes({
-          @JsonSubTypes.Type(value = DotPrimary.class, name = "DotPrimary"),
-          @JsonSubTypes.Type(value = UnaryExpression.class, name = "UnaryExpression"),
-          @JsonSubTypes.Type(value = BinaryExpression.class, name = "BinaryExpression"),
-          @JsonSubTypes.Type(value = TermPrimary.class, name = "TermPrimary"),
-  })
-    public static class Expression
-          extends Statement
-  {
-
-    public Expression() {
-    }
-    protected Type type;
-
-    public Type getType() {
-      return type;
-    }
-
-    public void setType(Type value) {
-      this.type = value;
-    }
-
-  }
-
-  public static class PrimaryExpression
-          extends Expression
-  {
-
-
-  }
-
-  @JsonDeserialize(using = LabelDeserializer.class)
-    public static class Label {
-
-      public Label() {
-      }
-
-      protected String name;
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String value) {
-      this.name = value;
-    }
-
-  }
-
-
-    public static class ParentSuffixPrimary {
-
-    protected List<Expression> arguments;
-    protected Integer lineNumber;
-    protected Integer character;
-
-      public ParentSuffixPrimary() {
-      }
-
-      public List<Expression> getArguments() {
-      if (arguments == null) {
-        arguments = new ArrayList<Expression>();
-      }
-      return this.arguments;
-    }
-
-    public Integer getLineNumber() {
-      return lineNumber;
-    }
-
-    public void setLineNumber(Integer value) {
-      this.lineNumber = value;
-    }
-
-
-    public Integer getCharacter() {
-      return character;
-    }
-
-
-    public void setCharacter(Integer value) {
-      this.character = value;
-    }
-
-  }
-
-  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-  @JsonSubTypes({
-          @JsonSubTypes.Type(value = OrdinaryPrimitiveType.class, name = "OrdinaryPrimitiveType")
-  })
-    public static class Type {
-
-      public Type() {
-      }
-
-    protected Integer lineNumber;
-    protected Integer character;
-
-
-    public Integer getLineNumber() {
-      return lineNumber;
-    }
-
-    public void setLineNumber(Integer value) {
-      this.lineNumber = value;
-    }
-
-    public Integer getCharacter() {
-      return character;
-    }
-
-    public void setCharacter(Integer value) {
-      this.character = value;
-    }
-
-    public String getTypeName() {
-      return "General-Type";
-    }
-
-    public boolean canTypeCastTo(Type target) {
-      return this.canTypeUpCastTo(target) || canTypeDownCastTo(target);
-    }
-
-    public boolean canTypeDownCastTo(Type target) {
-      return target.canTypeUpCastTo(this);
-    }
-
-    public boolean canTypeUpCastTo(Type target) {
-      return false;
-    }
-
-    public static Comparator<Type> getCastableComparator() {
-      return new Comparator<Type>() {
-        public int compare(Type base, Type target) {
-          if (!base.canTypeUpCastTo(target))
-            return 1;
-          return 0;
-        }
-      };
-    }
-
-    public static Comparator<Type> getExactComparator() {
-      return new Comparator<Type>() {
-        public int compare(Type base, Type target) {
-          if (base instanceof OrdinaryPrimitiveType) {
-            if (base != target)
-              return 1;
-          } else if (base instanceof ArrayType) {
-            if (!base.canTypeUpCastTo(target))
-              return 1;
-            ArrayType baseArrayType = (ArrayType) base;
-            ArrayType targetArrayType = (ArrayType) target;
-            if (baseArrayType.getOrdinaryPrimitiveType() != targetArrayType
-                    .getOrdinaryPrimitiveType()) {
-              return 1;
-            }
-          }
-          return 0;
-        }
-      };
-    }
-
-  }
-
-  public static class OrdinaryPrimitiveType
-          extends Type
-  {
-
-    public OrdinaryPrimitiveType() {
-    }
-
-    protected String name;
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String value) {
-      this.name = value;
-    }
-
-    @Override
-    public String getTypeName() {
-      return this.getName();
-    }
-
-
-  }
-
-  public static class ArrayType
-          extends Type
-  {
-
-    protected List<Integer> dimensions;
-    protected OrdinaryPrimitiveType ordinaryPrimitiveType;
-
-    public List<Integer> getDimensions() {
-      if (dimensions == null) {
-        dimensions = new ArrayList<Integer>();
-      }
-      return this.dimensions;
-    }
-
-    public OrdinaryPrimitiveType getOrdinaryPrimitiveType() {
-      return ordinaryPrimitiveType;
-    }
-
-    public void setOrdinaryPrimitiveType(OrdinaryPrimitiveType value) {
-      this.ordinaryPrimitiveType = value;
-    }
-
-    @Override
-    public String getTypeName() {
-      String retValueSuffix = "";
-      for (int dimention : this.getDimensions())
-        retValueSuffix += "[" + (dimention == 0 ? "" : dimention) + "]";
-      return this.getOrdinaryPrimitiveType().getTypeName() + retValueSuffix;
-    }
-  }
-
-
-    public static class Annotation {
-
-      public Annotation() {
-      }
-
-    protected Expression value;
-    protected String identifier;
-    protected Integer lineNumber;
-    protected Integer character;
-
-    public Expression getValue() {
-      return value;
-    }
-
-    public void setValue(Expression value) {
-      this.value = value;
-    }
-
-    public String getIdentifier() {
-      return identifier;
-    }
-
-    public void setIdentifier(String value) {
-      this.identifier = value;
-    }
-
-    public Integer getLineNumber() {
-      return lineNumber;
-    }
-
-    public void setLineNumber(Integer value) {
-      this.lineNumber = value;
-    }
-
-    public Integer getCharacter() {
-      return character;
-    }
-
-    public void setCharacter(Integer value) {
-      this.character = value;
-    }
-
-  }
-
-
-    public static class Statement {
-
-      public Statement() {
-      }
-    protected Integer lineNumber;
-    protected Integer character;
-    protected List<Annotation> annotations;
-
-
-      public Object getAnnotations() {
-      if (annotations == null) {
-        annotations = new ArrayList<Annotation>();
-      }
-      return this.annotations;
-    }
-
-      public void setAnnotations(List<Annotation> annotations) {
-        this.annotations = annotations;
-      }
-
-      public Integer getLineNumber() {
-      return lineNumber;
-    }
-
-    public void setLineNumber(Integer value) {
-      this.lineNumber = value;
-    }
-
-    public Integer getCharacter() {
-      return character;
-    }
-
-    public void setCharacter(Integer value) {
-      this.character = value;
-    }
-
-  }
-
-
-  public static class Converter {
-
-    public static Formula convertToFormula(BinaryExpression binaryExpression) {
-      if ("&&".equals(binaryExpression.getOperator())) {
-        // Handle conjunction (&&)
-        Formula leftFormula = convertToFormula(binaryExpression.getLeft());
-        Formula rightFormula = convertToFormula(binaryExpression.getRight());
-        return new Conjunction(Arrays.asList(leftFormula, rightFormula));
-      } else if ("||".equals(binaryExpression.getOperator())) {
-        // Handle disjunction (||)
-        Formula leftFormula = convertToFormula(binaryExpression.getLeft());
-        Formula rightFormula = convertToFormula(binaryExpression.getRight());
-        return new Disjunction(Arrays.asList(leftFormula, rightFormula));
-      }else if ("G".equals(binaryExpression.getOperator())) {
-        // Handle G operator
-        return new GOperator(convertToFormula(binaryExpression.getLeft()));
-      } else if ("F".equals(binaryExpression.getOperator())) {
-        // Handle F operator
-        return new FOperator(convertToFormula(binaryExpression.getLeft()));
-      } else if ("M".equals(binaryExpression.getOperator())) {
-        // Handle M operator
-        return new MOperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
-      }else if ("R".equals(binaryExpression.getOperator())) {
-        // Handle R operator
-        return new ROperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
-      }else if ("U".equals(binaryExpression.getOperator())) {
-        // Handle U operator
-        return new UOperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
-      }else if ("W".equals(binaryExpression.getOperator())) {
-        // Handle W operator
-        return new WOperator(convertToFormula(binaryExpression.getLeft()), convertToFormula(binaryExpression.getRight()));
-      }else if ("X".equals(binaryExpression.getOperator())) {
-        // Handle X operator
-        return new XOperator(convertToFormula(binaryExpression.getLeft()));
-      } else if ("X".equals(binaryExpression.getOperator())) {
-        // Handle X operator
-        return new XOperator(convertToFormula(binaryExpression.getLeft()));
-      }
-      return null; // Add more cases as needed
-    }
-
-    // Method to convert a general Expression to Formula
-    public static Formula convertToFormula(Expression expression) {
-      if (expression instanceof TermPrimary) {
-        TermPrimary termPrimary = (TermPrimary) expression;
-        return new Literal(termPrimary.getCharacter());
-      } else if (expression instanceof BinaryExpression) {
-        return convertToFormula((BinaryExpression) expression);
-      }
-      return null; // Add more cases as needed
-    }
-
-    // Convert an LTLDefinition to LabelledFormula
-    public static LabelledFormula convertToLabelledFormula(LTLDefinition ltlDefinition) {
-      Formula formula = convertToFormula(ltlDefinition.getExpression());
-      BitSet atomicPropsBitSet = formula.atomicPropositions(true); // Collect atomic propositions
-      List<String> atomicProps = LabelledFormula.bitSetToStrings(atomicPropsBitSet); // Convert BitSet to List<String>
-
-      // Return LabelledFormula using the 'of' method
-      return LabelledFormula.of(formula, atomicProps);
-    }
-
-  }
-
-    public static LabelledFormula convertingFacade() {
-    // Sample data: Create a t1.png structure
-    Converter converter = new Converter();
-    TermPrimary termP0s = new TermPrimary();
-    termP0s.setName("p0s");
-    termP0s.setCharacter(0);
-
-
-    TermPrimary termP1s = new TermPrimary();
-    termP1s.setName("p1s");
-    termP1s.setCharacter(1);
-
-
-    TermPrimary termP2s = new TermPrimary();
-    termP2s.setName("p2s");
-    termP2s.setCharacter(2);
-
-    BinaryExpression gP0s = new BinaryExpression();
-    gP0s.setLeft(termP0s);
-    gP0s.setOperator("G");
-
-    BinaryExpression gP1s = new BinaryExpression();
-    gP1s.setLeft(termP1s);
-    gP1s.setOperator("G");
-
-    BinaryExpression gP2s = new BinaryExpression();
-    gP2s.setLeft(termP2s);
-    gP2s.setOperator("G");
-
-    BinaryExpression firstConjunction = new BinaryExpression();
-    firstConjunction.setLeft(gP0s);
-    firstConjunction.setRight(gP1s);
-    firstConjunction.setOperator("&&");
-
-    BinaryExpression finalConjunction = new BinaryExpression();
-    finalConjunction.setLeft(firstConjunction);
-    finalConjunction.setRight(gP2s);
-    finalConjunction.setOperator("&&");
-
-
-    LTLDefinition ltlDefinition = new LTLDefinition();
-    ltlDefinition.setExpression(finalConjunction);
-    ltlDefinition.setName("Safety");
-
-
-    // Create a BinaryExpression for G(p1)
-   BinaryExpression innerBinaryExpr = new BinaryExpression();
-   innerBinaryExpr.setLeft(termP1s);
-   innerBinaryExpr.setOperator("G");
-   innerBinaryExpr.setCharacter(2);
-
-   // Create a BinaryExpression for p0 && G(p1)
-   BinaryExpression outerBinaryExpr = new BinaryExpression();
-   outerBinaryExpr.setLeft(termP0s);
-   outerBinaryExpr.setRight(innerBinaryExpr);
-   outerBinaryExpr.setOperator("&&");
-   outerBinaryExpr.setCharacter(3);
-
-   // Create LTLDefinition
-   LTLDefinition ltlDefinition1 = new LTLDefinition();
-   ltlDefinition1.setExpression(outerBinaryExpr);
-   ltlDefinition1.setName("Deadlock");
-
-
-    // Convert LTLDefinition to LabelledFormula
-    // List<LabelledFormula> labelledFormulas;
-    LabelledFormula labelledFormula = converter.convertToLabelledFormula(ltlDefinition);
-    // labelledFormulas.add(labelledFormula);
-
-
-    return labelledFormula;
-  }
-
-
-
-
-
-
-
-
-
-    
     
 	private static void printExpressionDetails(org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.Expression expr, String indent) {
 		if (expr == null) {
@@ -1183,22 +499,321 @@ public final class Mixins {
 			}
 		}
 		System.out.println("  ],");
-		System.out.println("  \"assertionDefinitions\": [");
-		if (grammer.getAssertionDefinitions() != null) {
-			for (int i = 0; i < grammer.getAssertionDefinitions().size(); i++) {
-				System.out.print("    " + grammer.getAssertionDefinitions().get(i));
-				if (i < grammer.getAssertionDefinitions().size() - 1) {
-					System.out.println(",");
-				} else {
-					System.out.println();
-				}
-			}
-		}
-		System.out.println("  ]");
+    System.out.println("  \"assertionDefinitions\": [");
+    if (grammer.getAssertionDefinitions() != null) {
+        for (int i = 0; i < grammer.getAssertionDefinitions().size(); i++) {
+            AssertionDefinition assertionDef = grammer.getAssertionDefinitions().get(i);
+            System.out.println("    {");
+            System.out.println("      \"name\": \"" + assertionDef.getName() + "\",");
+            System.out.println("      \"expression\": {");
+            printExpressionDetails(assertionDef.getExpression(), "        ");
+            System.out.println("      }");
+            System.out.print("    }");
+            if (i < grammer.getAssertionDefinitions().size() - 1) {
+                System.out.println(",");
+            } else {
+                System.out.println();
+            }
+        }
+    }
+    System.out.println("  ]");
 		System.out.println("}");
+}
 
 
-  
+
+
+public static class RebecaExpressionConverter {
+    
+    // Map to store atomic propositions for consistent naming
+    private static Map<String, Integer> atomicPropositionMap = new HashMap<>();
+    private static int atomicPropositionCounter = 0;
+    
+    /**
+     * Main conversion method for Rebeca Expression to Owl Formula
+     */
+    public static Formula convertToFormula(Expression expression) {
+        if (expression == null) {
+            return BooleanConstant.FALSE;
+        }
+        
+        if (expression instanceof BinaryExpression) {
+            return convertBinaryExpression((BinaryExpression) expression);
+        } else if (expression instanceof UnaryExpression) {
+            return convertUnaryExpression((UnaryExpression) expression);
+        } else if (expression instanceof DotPrimary) {
+            return convertDotPrimary((DotPrimary) expression);
+        } else if (expression instanceof TermPrimary) {
+            return convertTermPrimary((TermPrimary) expression);
+        } else if (expression instanceof Literal) {
+            return convertLiteral((Literal) expression);
+        } else if (expression instanceof TernaryExpression) {
+            return convertTernaryExpression((TernaryExpression) expression);
+        } else if (expression instanceof PlusSubExpression) {
+            return convertPlusSubExpression((PlusSubExpression) expression);
+        } else if (expression instanceof CastExpression) {
+            return convertCastExpression((CastExpression) expression);
+        } else if (expression instanceof InstanceofExpression) {
+            return convertInstanceofExpression((InstanceofExpression) expression);
+        } else if (expression instanceof NonDetExpression) {
+            return convertNonDetExpression((NonDetExpression) expression);
+        }
+        
+        // Fallback: treat unknown expressions as atomic propositions
+        System.err.println("Warning: Unknown expression type: " + expression.getClass().getSimpleName());
+        return createAtomicProposition("unknown_" + expression.getClass().getSimpleName());
+    }
+    
+    /**
+     * Convert BinaryExpression to Formula
+     */
+    private static Formula convertBinaryExpression(BinaryExpression expr) {
+        String operator = expr.getOperator();
+        Formula left = convertToFormula(expr.getLeft());
+        Formula right = convertToFormula(expr.getRight());
+        
+        switch (operator) {
+            // Logical operators
+            case "&&":
+            case "and":
+                return new Conjunction(Arrays.asList(left, right));
+            case "||":
+            case "or":
+                return new Disjunction(Arrays.asList(left, right));
+            case "->":
+            case "implies":
+                return new Disjunction(Arrays.asList(new Negation(left), right));
+            case "<->":
+            case "iff":
+                return new Conjunction(Arrays.asList(
+                    new Disjunction(Arrays.asList(new Negation(left), right)),
+                    new Disjunction(Arrays.asList(left, new Negation(right)))
+                ));
+            
+            // Temporal operators
+            case "G":
+            case "globally":
+                return new GOperator(left);
+            case "F":
+            case "finally":
+                return new FOperator(left);
+            case "X":
+            case "next":
+                return new XOperator(left);
+            case "U":
+            case "until":
+                return new UOperator(left, right);
+            case "W":
+            case "weak_until":
+                return new WOperator(left, right);
+            case "M":
+            case "strong_release":
+                return new MOperator(left, right);
+            case "R":
+            case "release":
+                return new ROperator(left, right);
+            
+            // Comparison operators (treat as atomic propositions)
+            case "==":
+            case "!=":
+            case "<":
+            case "<=":
+            case ">":
+            case ">=":
+                return createAtomicProposition(expressionToString(expr));
+            
+            // Arithmetic operators (treat as atomic propositions)
+            case "+":
+            case "-":
+            case "*":
+            case "/":
+            case "%":
+                return createAtomicProposition(expressionToString(expr));
+            
+            default:
+                System.err.println("Warning: Unknown binary operator: " + operator);
+                return createAtomicProposition(expressionToString(expr));
+        }
+    }
+    
+    /**
+     * Convert UnaryExpression to Formula
+     */
+    private static Formula convertUnaryExpression(UnaryExpression expr) {
+        String operator = expr.getOperator();
+        Formula operand = convertToFormula(expr.getExpression());
+        
+        switch (operator) {
+            case "!":
+            case "not":
+                return new Negation(operand);
+            case "G":
+            case "globally":
+                return new GOperator(operand);
+            case "F":
+            case "finally":
+                return new FOperator(operand);
+            case "X":
+            case "next":
+                return new XOperator(operand);
+            case "-":
+            case "+":
+                // Arithmetic unary operators - treat as atomic propositions
+                return createAtomicProposition(expressionToString(expr));
+            default:
+                System.err.println("Warning: Unknown unary operator: " + operator);
+                return createAtomicProposition(expressionToString(expr));
+        }
+    }
+    
+    /**
+     * Convert DotPrimary (object.property access) to atomic proposition
+     */
+    private static Formula convertDotPrimary(DotPrimary expr) {
+        String leftStr = expressionToString(expr.getLeft());
+        String rightStr = expressionToString(expr.getRight());
+        String atomicProp = leftStr + "." + rightStr;
+        return createAtomicProposition(atomicProp);
+    }
+    
+    /**
+     * Convert TermPrimary to atomic proposition
+     */
+    private static Formula convertTermPrimary(TermPrimary expr) {
+        String name = expr.getName();
+        if (name != null && !name.isEmpty()) {
+            return createAtomicProposition(name);
+        }
+        return createAtomicProposition("term_" + System.identityHashCode(expr));
+    }
+    
+    /**
+     * Convert Literal to appropriate Formula
+     */
+    private static Formula convertLiteral(Literal expr) {
+        // Try to get the literal value
+        String value = expr.getLiteralValue();
+        if (value != null) {
+            switch (value.toLowerCase()) {
+                case "true":
+                    return BooleanConstant.TRUE;
+                case "false":
+                    return BooleanConstant.FALSE;
+                default:
+                    return createAtomicProposition(value);
+            }
+        }
+        return createAtomicProposition("literal_" + System.identityHashCode(expr));
+    }
+    
+    /**
+     * Convert TernaryExpression (condition ? true_expr : false_expr)
+     */
+    private static Formula convertTernaryExpression(TernaryExpression expr) {
+        Formula condition = convertToFormula(expr.getCondition());
+        Formula trueExpr = convertToFormula(expr.getLeft());
+        Formula falseExpr = convertToFormula(expr.getRight());
+        
+        // (condition && trueExpr) || (!condition && falseExpr)
+        return new Disjunction(Arrays.asList(
+            new Conjunction(Arrays.asList(condition, trueExpr)),
+            new Conjunction(Arrays.asList(new Negation(condition), falseExpr))
+        ));
+    }
+    
+    /**
+     * Convert PlusSubExpression to atomic proposition
+     */
+    private static Formula convertPlusSubExpression(PlusSubExpression expr) {
+        return createAtomicProposition(expressionToString(expr));
+    }
+    
+    /**
+     * Convert CastExpression to atomic proposition
+     */
+    private static Formula convertCastExpression(CastExpression expr) {
+        return createAtomicProposition(expressionToString(expr));
+    }
+    
+    /**
+     * Convert InstanceofExpression to atomic proposition
+     */
+    private static Formula convertInstanceofExpression(InstanceofExpression expr) {
+        return createAtomicProposition(expressionToString(expr));
+    }
+    
+    /**
+     * Convert NonDetExpression to atomic proposition
+     */
+    private static Formula convertNonDetExpression(NonDetExpression expr) {
+        return createAtomicProposition(expressionToString(expr));
+    }
+    
+    /**
+     * Create an atomic proposition with consistent indexing
+     */
+    private static Formula createAtomicProposition(String name) {
+        Integer index = atomicPropositionMap.get(name);
+        if (index == null) {
+            index = atomicPropositionCounter++;
+            atomicPropositionMap.put(name, index);
+        }
+        return new owl.ltl.Literal(index);
+    }
+    
+    /**
+     * Convert expression to string representation for atomic propositions
+     */
+    private static String expressionToString(Expression expr) {
+        if (expr instanceof TermPrimary) {
+            TermPrimary term = (TermPrimary) expr;
+            return term.getName() != null ? term.getName() : "term";
+        } else if (expr instanceof DotPrimary) {
+            DotPrimary dot = (DotPrimary) expr;
+            return expressionToString(dot.getLeft()) + "." + expressionToString(dot.getRight());
+        } else if (expr instanceof Literal) {
+            Literal lit = (Literal) expr;
+            return lit.getLiteralValue() != null ? lit.getLiteralValue() : "literal";
+        } else if (expr instanceof BinaryExpression) {
+            BinaryExpression bin = (BinaryExpression) expr;
+            return "(" + expressionToString(bin.getLeft()) + " " + bin.getOperator() + " " + expressionToString(bin.getRight()) + ")";
+        } else if (expr instanceof UnaryExpression) {
+            UnaryExpression un = (UnaryExpression) expr;
+            return un.getOperator() + "(" + expressionToString(un.getExpression()) + ")";
+        }
+        return expr.getClass().getSimpleName();
+    }
+    
+    /**
+     * Convert a Definition to LabelledFormula
+     */
+    public static LabelledFormula convertDefinitionToLabelledFormula(Definition definition) {
+        Formula formula = convertToFormula(definition.getExpression());
+        
+        // Create atomic propositions list from our map
+        List<String> atomicProps = new ArrayList<>();
+        for (int i = 0; i < atomicPropositionCounter; i++) {
+            atomicProps.add(null); // Initialize with nulls
+        }
+        
+        // Fill in the atomic proposition names
+        for (Map.Entry<String, Integer> entry : atomicPropositionMap.entrySet()) {
+            atomicProps.set(entry.getValue(), entry.getKey());
+        }
+        
+        // Remove nulls and ensure we have at least empty list
+        atomicProps.removeIf(Objects::isNull);
+        
+        return LabelledFormula.of(formula, atomicProps);
+    }
+    
+    /**
+     * Reset the atomic proposition mapping (useful for processing multiple formulas)
+     */
+    public static void resetAtomicPropositions() {
+        atomicPropositionMap.clear();
+        atomicPropositionCounter = 0;
+    }
 }
 
 
@@ -1207,75 +822,192 @@ public final class Mixins {
 
 
 
+    public static LabelledFormula testRebecaConverter() {
+        // Create TermPrimary expressions for atomic propositions
+        TermPrimary termP0s = new TermPrimary();
+        termP0s.setName("p0s");
+
+        TermPrimary termP1s = new TermPrimary();
+        termP1s.setName("p1s");
+
+        TermPrimary termP2s = new TermPrimary();
+        termP2s.setName("p2s");
+
+        // Create G(p0s) - Globally p0s
+        BinaryExpression gP0s = new BinaryExpression();
+        gP0s.setLeft(termP0s);
+        gP0s.setOperator("G");
+
+        // Create G(p1s) - Globally p1s
+        BinaryExpression gP1s = new BinaryExpression();
+        gP1s.setLeft(termP1s);
+        gP1s.setOperator("G");
+
+        // Create G(p2s) - Globally p2s
+        BinaryExpression gP2s = new BinaryExpression();
+        gP2s.setLeft(termP2s);
+        gP2s.setOperator("G");
+
+        // Create G(p0s) && G(p1s)
+        BinaryExpression firstConjunction = new BinaryExpression();
+        firstConjunction.setLeft(gP0s);
+        firstConjunction.setRight(gP1s);
+        firstConjunction.setOperator("&&");
+
+        // Create (G(p0s) && G(p1s)) && G(p2s)
+        BinaryExpression finalConjunction = new BinaryExpression();
+        finalConjunction.setLeft(firstConjunction);
+        finalConjunction.setRight(gP2s);
+        finalConjunction.setOperator("&&");
+
+        // Create Definition using the new Rebeca structure
+        Definition definition = new Definition();
+        definition.setExpression(finalConjunction);
+        definition.setName("Safety");
+
+        // Convert Definition to LabelledFormula using the new converter
+        LabelledFormula labelledFormula = RebecaExpressionConverter.convertDefinitionToLabelledFormula(definition);
+
+        return labelledFormula;
+    }
+
+    public static LabelledFormula testSimpleRebecaConverter() {
+        // Create TermPrimary expressions
+        TermPrimary termP0s = new TermPrimary();
+        termP0s.setName("p0s");
+
+        TermPrimary termP1s = new TermPrimary();
+        termP1s.setName("p1s");
+
+        // Create G(p1s)
+        BinaryExpression gP1s = new BinaryExpression();
+        gP1s.setLeft(termP1s);
+        gP1s.setOperator("G");
+
+        // Create p0s && G(p1s)
+        BinaryExpression conjunction = new BinaryExpression();
+        conjunction.setLeft(termP0s);
+        conjunction.setRight(gP1s);
+        conjunction.setOperator("&&");
+
+        // Create Definition
+        Definition definition = new Definition();
+        definition.setExpression(conjunction);
+        definition.setName("Deadlock");
 
 
+        // Convert to LabelledFormula
+        LabelledFormula labelledFormula = RebecaExpressionConverter.convertDefinitionToLabelledFormula(definition);
 
-
-
-
-
-
+        return labelledFormula;
+    }
 
 
 
    // Function to parse LTLDefinition into a LabelledFormula
-   public static Stream<LabelledFormula> parseLtlDefinitionToLabelledFormula(List<LTLDefinition> ltlDefinitions) {
-      Converter converter = new Converter();
-      return ltlDefinitions.stream()
-          .map(d -> converter.convertToLabelledFormula(d));
-   }
+  //  public static Stream<LabelledFormula> parseLtlDefinitionToLabelledFormula(List<LTLDefinition> ltlDefinitions) {
+  //     Converter converter = new Converter();
+  //     return ltlDefinitions.stream()
+  //         .map(d -> converter.convertToLabelledFormula(d));
+  //  }
+
+  // public static Stream<LabelledFormula> parseDefinitionToLabelledFormula(List<Definition> ltlDefinitions) {
+  //       System.out.println("parseDefinitionToLabelledFormula" + ltlDefinitions.size());
+
+  //     NewConverter converter = new NewConverter();
+
+  //     List<LabelledFormula> converted = new ArrayList<>();
+  //     for (Definition d : ltlDefinitions) {
+  //         converted.add(converter.convertDefintionToLabelledFormula(d));
+  //     }
+  //     return converted.stream();
+  //     // return ltlDefinitions.stream()
+  //     //     .map(d -> converter.convertDefintionToLabelledFormula(d));
+  //  }
 
    // Function to read and parse the LTLDefinition from JSON and return a stream of LabelledFormulas
-   public static List<LTLDefinition> parseLtlDefinitionFromJson(String filePath) throws IOException {
-      ObjectMapper mapper = new ObjectMapper();
+  //  public static List<LTLDefinition> parseLtlDefinitionFromJson(String filePath) throws IOException {
+  //     ObjectMapper mapper = new ObjectMapper();
 
-      Root root = mapper.readValue(new File(filePath), Root.class);
-      return root.getDefinitions();
+  //     Root root = mapper.readValue(new File(filePath), Root.class);
+  //     return root.getDefinitions();
+  //  }
+
+  
+   // Function to read and parse the LTLDefinition from JSON and return a stream of LabelledFormulas
+   public static Stream<LabelledFormula> testRebecaToLTL() {
+        List<LabelledFormula> labelledFormulas = new ArrayList<>();
+        LabelledFormula labelledFormula1 = testRebecaConverter();
+        LabelledFormula labelledFormula2 = testSimpleRebecaConverter();
+        labelledFormulas.add(labelledFormula1);
+        labelledFormulas.add(labelledFormula2);
+
+        return labelledFormulas.stream();
    }
-   public static Stream<LabelledFormula> rebecaToLTL(String filePath) {
-     try (var ctx = new AnnotationConfigApplicationContext(CompilerConfig.class)){
-      RebecaModelCompiler modelCompiler = ctx.getBean(RebecaModelCompiler.class);
-      PropertyCompiler propertyCompiler = ctx.getBean(PropertyCompiler.class);
-      ExceptionContainer exceptions     = ctx.getBean(ExceptionContainer.class);
+
+   public static Stream<LabelledFormula> rebecaToLTL(String rebeceFilePath, String propertyFilePath, Boolean print) {
+    try (var ctx = new AnnotationConfigApplicationContext(CompilerConfig.class)) {
+        RebecaModelCompiler modelCompiler = ctx.getBean(RebecaModelCompiler.class);
+        PropertyCompiler propertyCompiler = ctx.getBean(PropertyCompiler.class);
+        ExceptionContainer exceptions = ctx.getBean(ExceptionContainer.class);
 
 
-        File model = new File("DiningPhilosophers.rebeca");
-        File property = new File("DiningPhilosophers.property");
+        File model = new File(rebeceFilePath);
+		    File property = new File(propertyFilePath);
 
         Set<CompilerExtension> extension = new HashSet<CompilerExtension>();
-        Pair<RebecaModel, SymbolTable> modelCompilatioResult = modelCompiler.compileRebecaFile(model, extension, CoreVersion.CORE_2_0);
+        Pair<RebecaModel, SymbolTable> modelCompilationResult = modelCompiler.compileRebecaFile(model, extension, CoreVersion.CORE_2_0);
         
-        PropertyModel grammer = propertyCompiler.compilePropertyFile(property, modelCompilatioResult.getFirst(), extension);
+        PropertyModel propertyModel = propertyCompiler.compilePropertyFile(property, modelCompilationResult.getFirst(), extension);
+
+        if(print)
+            printDetailedPropertyModelInformation(propertyModel);
+
+        // Reset atomic propositions for fresh conversion
+        RebecaExpressionConverter.resetAtomicPropositions();
+        
+        // Convert PropertyModel definitions directly to LabelledFormulas
+        List<LabelledFormula> labelledFormulas = new ArrayList<>();
+        
+        if (propertyModel.getDefinitions() != null) {
+            for (Definition definition : propertyModel.getDefinitions()) {
+                try {
+                    LabelledFormula labelledFormula = RebecaExpressionConverter.convertDefinitionToLabelledFormula(definition);
+                    labelledFormulas.add(labelledFormula);
+                    // System.out.println("Converted definition '" + definition.getName() + "' to formula: " + labelledFormula.formula());
+                } catch (Exception e) {
+                    System.err.println("Error converting definition '" + definition.getName() + "': " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        }
 
         
-
-        printDetailedPropertyModelInformation(grammer);
-
-
-       List<LTLDefinition>  ltlDefinitions = parseLtlDefinitionFromJson(filePath);
-       return parseLtlDefinitionToLabelledFormula(ltlDefinitions);
-     } catch (IOException e) {
-       e.printStackTrace();
-     }  
-     return null;
+        return labelledFormulas.stream();
+        
+    } catch (Exception e) {
+        System.err.println("Error in rebecaToLTL: " + e.getMessage());
+        e.printStackTrace();
+        return Stream.empty();
+    }
     }
 
-  public static class LabelDeserializer extends JsonDeserializer<Label> {
-    @Override
-    public Label deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-      JsonNode node = p.getCodec().readTree(p);
+  // public static class LabelDeserializer extends JsonDeserializer<Label> {
+  //   @Override
+  //   public Label deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+  //     JsonNode node = p.getCodec().readTree(p);
 
-      if (node.has("type") && "null".equals(node.get("type").asText())) {
-        return null;
-      }
+  //     if (node.has("type") && "null".equals(node.get("type").asText())) {
+  //       return null;
+  //     }
 
-      Label label = new Label();
-      if (node.has("name")) {
-        label.setName(node.get("name").asText());
-      }
-      return label;
-    }
-  }
+  //     Label label = new Label();
+  //     if (node.has("name")) {
+  //       label.setName(node.get("name").asText());
+  //     }
+  //     return label;
+  //   }
+  // }
 
 
 

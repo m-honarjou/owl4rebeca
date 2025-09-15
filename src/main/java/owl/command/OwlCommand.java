@@ -95,13 +95,17 @@ public final class OwlCommand extends AbstractOwlCommand {
   }
 
   public static void main(String[] args) {
-    Mixins.rebecaToLTL(args[1]);
-    // if("rebeca2ltl".equals(args[0]))
-    //   Mixins.rebecaToLTL(args[1]).forEach(System.out::println);
-    // else  
-    //   System.exit(new CommandLine(new OwlCommand(args))
-    //     .setExecutionExceptionHandler(new ExecutionExceptionHandler())
-    //     .execute(args));
+    Boolean print = false;
+    if(args.length > 3 && "printModel".equals(args[3]))
+      print = true;
+    if("testrebeca2ltl".equals(args[0]))
+      Mixins.testRebecaToLTL().forEach(System.out::println);
+    else if("rebeca2ltl".equals(args[0]))
+      Mixins.rebecaToLTL(args[1], args[2], print).forEach(System.out::println);
+    else  
+      System.exit(new CommandLine(new OwlCommand(args))
+        .setExecutionExceptionHandler(new ExecutionExceptionHandler())
+        .execute(args));
   }
 
   @Override
