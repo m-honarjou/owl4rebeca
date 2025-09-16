@@ -34,6 +34,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -41,16 +42,29 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import javax.swing.plaf.synth.SynthStyle;
-
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.rebecalang.compiler.CompilerConfig;
+import org.rebecalang.compiler.modelcompiler.RebecaModelCompiler;
+import org.rebecalang.compiler.modelcompiler.SymbolTable;
+import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.RebecaModel;
+import org.rebecalang.compiler.propertycompiler.PropertyCompiler;
+import org.rebecalang.compiler.propertycompiler.generalrebeca.objectmodel.Definition;
+import org.rebecalang.compiler.propertycompiler.generalrebeca.objectmodel.PropertyModel;
+import org.rebecalang.compiler.utils.CompilerExtension;
+import org.rebecalang.compiler.utils.CoreVersion;
+import org.rebecalang.compiler.utils.ExceptionContainer;
+import org.rebecalang.compiler.utils.Pair;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import owl.automaton.Automaton;
 import owl.automaton.Views;
 import owl.automaton.acceptance.EmersonLeiAcceptance;
@@ -58,77 +72,17 @@ import owl.automaton.acceptance.OmegaAcceptanceCast;
 import owl.automaton.hoa.HoaReader;
 import owl.automaton.hoa.HoaWriter;
 import owl.bdd.FactorySupplier;
-import owl.ltl.*;
-// import owl.ltl.LabelledFormula;
-
-// import owl.ltl.Literal;
-// import owl.ltl.Conjunction;
-
-
+import owl.ltl.LabelledFormula;
 import owl.ltl.parser.LtlParser;
 import owl.ltl.visitors.PrintVisitor;
+import owl.rebeca.RebecaExpressionConverter;
+import owl.rebeca.RebecaPropertyPrinter;
 import owl.thirdparty.jhoafparser.consumer.HOAConsumerException;
 import owl.thirdparty.jhoafparser.consumer.HOAIntermediateStoreAndManipulate;
 import owl.thirdparty.jhoafparser.owl.extensions.HOAConsumerPrintFixed;
 import owl.thirdparty.jhoafparser.owl.extensions.ToStateAcceptanceFixed;
 import owl.thirdparty.jhoafparser.parser.generated.ParseException;
 
-import java.io.File;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.kotlin.KotlinModule;
-
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-
-import static owl.thirdparty.picocli.CommandLine.ArgGroup;
-import static owl.thirdparty.picocli.CommandLine.Option;
-
-
-import org.rebecalang.compiler.CompilerConfig;
-import org.rebecalang.compiler.modelcompiler.RebecaModelCompiler;
-import org.rebecalang.compiler.modelcompiler.ScopeException;
-import org.rebecalang.compiler.modelcompiler.SymbolTable;
-import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.RebecaModel;
-import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.*;
-
-import org.rebecalang.compiler.utils.CodeCompilationException;
-import org.rebecalang.compiler.utils.CompilerExtension;
-import org.rebecalang.compiler.utils.CoreVersion;
-import org.rebecalang.compiler.utils.ExceptionContainer;
-import org.rebecalang.compiler.utils.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.test.context.ContextConfiguration;
-// import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.rebecalang.compiler.propertycompiler.generalrebeca.objectmodel.AssertionDefinition;
-import org.rebecalang.compiler.propertycompiler.generalrebeca.objectmodel.Definition;
-import org.rebecalang.compiler.propertycompiler.generalrebeca.objectmodel.PropertyModel;
-// import org.rebecalang.compiler.propertycompiler.generalrebeca.objectmodel.PropertyCompiler;
-
-import java.util.Scanner;
-import org.rebecalang.compiler.propertycompiler.*;
-
-import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.Expression;
-import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.BinaryExpression;
-import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.UnaryExpression;
-import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.DotPrimary;
-import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.TermPrimary;
-import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.PrimaryExpression;
-import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.Literal;
-import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.TernaryExpression;
-import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.PlusSubExpression;
-import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.CastExpression;
-import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.InstanceofExpression;
-import org.rebecalang.compiler.modelcompiler.corerebeca.objectmodel.NonDetExpression;
-
-import owl.rebeca.RebecaPropertyPrinter;
-import owl.rebeca.RebecaExpressionConverter;
 
 @SuppressWarnings("PMD.ImmutableField")
 public final class Mixins {
