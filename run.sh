@@ -7,4 +7,4 @@ echo running: GeneralCoreRebecaModelWithInitialMethod
 echo running: CoreRebecaModelWithInitialMethod
 ./build/distributions/owl-jre-22.0-development/bin/owl  rebeca2ltl CoreRebecaModelWithInitialMethod.rebeca CoreRebecaModelWithInitialMethod.property printModel
 echo running: test t1.png
-./build/distributions/owl-jre-22.0-development/bin/owl  testrebeca2ltl DiningPhilosophers.rebeca DiningPhilosophers.property
+./build/distributions/owl-jre-22.0-development/bin/owl  testrebeca2ltl

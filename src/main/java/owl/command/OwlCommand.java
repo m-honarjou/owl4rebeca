@@ -38,6 +38,8 @@ import owl.thirdparty.jhoafparser.parser.generated.ParseException;
 import owl.thirdparty.picocli.CommandLine;
 import owl.thirdparty.picocli.CommandLine.Model.CommandSpec;
 
+import owl.rebeca.RebecaTestUtils;
+
 @Command(name = "owl",
          description =
            "A tool collection and library for ω-words, ω-automata and linear temporal logic.",
@@ -99,7 +101,7 @@ public final class OwlCommand extends AbstractOwlCommand {
     if(args.length > 3 && "printModel".equals(args[3]))
       print = true;
     if("testrebeca2ltl".equals(args[0]))
-      Mixins.testRebecaToLTL().forEach(System.out::println);
+      RebecaTestUtils.testRebecaToLTL().forEach(System.out::println);
     else if("rebeca2ltl".equals(args[0]))
       Mixins.rebecaToLTL(args[1], args[2], print).forEach(System.out::println);
     else  
