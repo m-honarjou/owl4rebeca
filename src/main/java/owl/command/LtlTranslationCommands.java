@@ -52,6 +52,7 @@ import owl.thirdparty.picocli.CommandLine.Option;
 import owl.translations.LtlTranslationRepository;
 import owl.translations.LtlTranslationRepository.LtlToLdbaTranslation;
 import owl.translations.LtlTranslationRepository.LtlToNbaTranslation;
+import java.util.stream.Stream;
 
 @SuppressWarnings("PMD.ImmutableField")
 final class LtlTranslationCommands {
@@ -111,7 +112,7 @@ final class LtlTranslationCommands {
 
       var subcommand = getClass().getAnnotation(Command.class).name();
       var translator = translation.translation(acceptanceClass, basicOptions, lookahead());
-
+      
       try (var source = formulaReader.source();
           var sink = automatonWriter.sink(subcommand, rawArgs())) {
 
@@ -177,6 +178,140 @@ final class LtlTranslationCommands {
       return BuchiAcceptance.class;
     }
   }
+
+////////////// start copying
+
+  private abstract static class AbstractRebeca2AutomatonCommand
+      <L extends A, A extends EmersonLeiAcceptance> extends AbstractOwlSubcommand {
+
+    protected static final String LIST_AVAILABLE_TRANSLATIONS = "The default translation is "
+        + "${DEFAULT-VALUE} and the following translations are available: ${COMPLETION-CANDIDATES}.";
+
+    @Mixin
+    private FormulaReader formulaReader = null;
+
+    @Mixin
+    private AutomatonWriter automatonWriter = null;
+
+    @Mixin
+    private FormulaSimplifier formulaSimplifier = null;
+
+    @Mixin
+    private AcceptanceSimplifier acceptanceSimplifier = null;
+
+
+    @Option(
+        names = "--skip-translation-portfolio",
+        description = "Bypass the portfolio of constructions from [S19, SE20] that directly "
+            + "translates 'simple' fragments of LTL to automata."
+    )
+    private boolean skipPortfolio = false;
+
+    
+    @Override
+    protected int run() throws Exception {
+      var translation = translation();
+      var acceptanceClass = acceptanceClass();
+
+      var basicOptions = EnumSet.noneOf(LtlTranslationRepository.Option.class);
+
+      if (!formulaSimplifier.skipSimplifier) {
+        basicOptions.add(SIMPLIFY_FORMULA);
+      }
+
+      if (!acceptanceSimplifier.skipAcceptanceSimplifier) {
+        basicOptions.add(SIMPLIFY_AUTOMATON);
+      }
+
+      if (automatonWriter.complete) {
+        basicOptions.add(COMPLETE);
+      }
+
+      if (!skipPortfolio) {
+        basicOptions.add(USE_PORTFOLIO_FOR_SYNTACTIC_LTL_FRAGMENTS);
+      }
+
+      basicOptions.addAll(extraOptions());
+
+      var subcommand = getClass().getAnnotation(Command.class).name();
+      var translator = translation.translation(acceptanceClass, basicOptions, lookahead());
+
+
+      try (var source = formulaReader.source();
+          var sink = automatonWriter.sink(subcommand, rawArgs())) {
+
+        Iterator<LabelledFormula> formulaIterator = source.iterator();
+
+        while (formulaIterator.hasNext()) {
+          LabelledFormula formula = formulaIterator.next();
+          sink.accept(translator.apply(formula), "Automaton for " + formula);
+        }
+      }
+
+      return 0;
+    }
+
+    protected abstract LtlTranslationRepository.LtlTranslation<L, A> translation();
+
+    protected abstract Class<? extends A> acceptanceClass();
+
+    protected Set<LtlTranslationRepository.Option> extraOptions() {
+      return Set.of();
+    }
+
+    protected OptionalInt lookahead() {
+      return OptionalInt.empty();
+    }
+  }
+
+    private abstract static class AbstractRebeca2NbaCommand
+      extends AbstractRebeca2AutomatonCommand<BuchiAcceptance, GeneralizedBuchiAcceptance> {
+
+    @Option(
+        names = {"-t", "--translation"},
+        description = {
+            LIST_AVAILABLE_TRANSLATIONS,
+            "EKS20: " + LtlToNbaTranslation.EKS20_DESCRIPTION
+        },
+        defaultValue = "EKS20",
+        showDefaultValue = CommandLine.Help.Visibility.NEVER
+    )
+    private LtlToNbaTranslation translation = LtlToNbaTranslation.DEFAULT;
+
+    @Override
+    protected final LtlToNbaTranslation translation() {
+      return translation;
+    }
+  }
+
+
+  @Command(
+            name = "rebeca2nba",
+            description = {
+                    "Translate a rebeca language and property into a.",
+                    "Usage Examples:",
+                    "  owl rebeca2nba ",
+                    "  owl rebeca2nba -i model-input-file -i property-input-file -p true",
+                    MiscCommands.BibliographyCommand.HOW_TO_USE
+            }
+    )
+
+    static final class Rebeca2nbaCommand extends AbstractRebeca2NbaCommand {
+
+        @Override
+        protected Class<? extends GeneralizedBuchiAcceptance> acceptanceClass() {
+          return BuchiAcceptance.class;
+        }
+
+
+
+        // @Override
+        // protected int run() throws Exception {
+
+        //     return 0;
+        // }
+    }
+
 
   @Command(
       name = "ltl2ngba",
@@ -386,6 +521,71 @@ final class LtlTranslationCommands {
       return RabinAcceptance.class;
     }
   }
+
+    @Command(
+            name = "rebeca2ltl",
+            description = {
+                    "Translate a rebeca language and property into a linear temporal logic (LTL) formula.",
+                    "Usage Examples:",
+                    "  owl rebeca2ltl ",
+                    "  owl rebeca2ltl -i model-input-file -i property-input-file -p true",
+                    MiscCommands.BibliographyCommand.HOW_TO_USE
+            }
+    )
+
+    static final class Rebeca2ltlCommand extends AbstractOwlSubcommand {
+
+        @Option(
+                names = {"-f", "--formula"},
+                description = "Use the argument of the option as the input formula."
+        )
+        private String[] rebecaFormula = null;
+
+        @Option(
+                names = {"-i", "--input-file"},
+                description = "Input file name."
+        )
+        private String[] rebecaInputFile = null;
+
+
+        @Option(
+                names = {"-p", "--print"},
+                description = "Input file name."
+        )
+        private String print = null;
+
+        @Override
+        protected int run() throws Exception {
+            // Print the formula string from -f option
+            if (rebecaFormula != null && rebecaFormula.length > 0) {
+                System.out.println(rebecaFormula[0]);
+            }
+            // System.out.println("print : " + (print != null && !print.isEmpty() && print.equalsIgnoreCase("true")));
+            // Print the filename from -i option
+            if (rebecaInputFile != null && rebecaInputFile.length > 0) {
+                Mixins.rebecaToLTL(rebecaInputFile[0], rebecaInputFile[1],
+                        print != null && !print.isEmpty() && print.equalsIgnoreCase("true")
+                ).forEach(System.out::println);
+            }
+
+            return 0;
+        }
+    }
+  // static final class RebecaLtl2DraCommand extends AbstractLtl2DraCommand {
+
+  //   @Override
+  //   protected int run() throws Exception {
+  //       System.out.print("labelledFormula");
+  //       String grammer = "((G(p2)) & (((G(p0)) & (G(p1)))))";
+  //       return super.run();
+  //   }
+
+
+  //   @Override
+  //   protected Class<? extends GeneralizedRabinAcceptance> acceptanceClass() {
+  //     return RabinAcceptance.class;
+  //   }
+  // }
 
   @Command(
       name = "ltl2dgra",

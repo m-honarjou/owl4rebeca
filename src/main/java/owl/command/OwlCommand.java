@@ -55,7 +55,8 @@ import owl.rebeca.RebecaTestUtils;
            LtlTranslationCommands.Ltl2DraCommand.class,
            LtlTranslationCommands.Ltl2DgraCommand.class,
            LtlTranslationCommands.Ltl2DelaCommand.class,
-          //  LtlTranslationCommands.RebecaLtl2DraCommand.class,
+           LtlTranslationCommands.Rebeca2ltlCommand.class,
+           LtlTranslationCommands.Rebeca2nbaCommand.class,
 
            // LTL Conversion Commands
            LtlConversionCommands.Delta2Normalisation.class,
@@ -96,15 +97,7 @@ public final class OwlCommand extends AbstractOwlCommand {
     this.args = Arrays.stream(args).filter(Predicate.not(Objects::isNull)).toList();
   }
 
-  public static void main(String[] args) {
-    Boolean print = false;
-    if(args.length > 3 && "printModel".equals(args[3]))
-      print = true;
-    if("testrebeca2ltl".equals(args[0]))
-      RebecaTestUtils.testRebecaToLTL().forEach(System.out::println);
-    else if("rebeca2ltl".equals(args[0]))
-      Mixins.rebecaToLTL(args[1], args[2], print).forEach(System.out::println);
-    else  
+  public static void main(String[] args) { 
       System.exit(new CommandLine(new OwlCommand(args))
         .setExecutionExceptionHandler(new ExecutionExceptionHandler())
         .execute(args));

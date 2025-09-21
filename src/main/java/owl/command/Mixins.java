@@ -268,7 +268,6 @@ public final class Mixins {
       String[] formulaFile = null;
 
     }
-
     Stream<String> stringSource() throws IOException {
       // Default to stdin.
       if (source == null) {
@@ -307,16 +306,20 @@ public final class Mixins {
       return stringStream.filter(Predicate.not(String::isBlank));
     }
 
-    Stream<LabelledFormula> source() throws IOException {
-      return stringSource().map((String line) -> {
-        try {
-          return LtlParser.parse(line);
-          // return convertingFacade();
-        } catch (RecognitionException | ParseCancellationException ex) {
-          throw new IllegalArgumentException(line, ex);
-        }
-      });
+
+    Stream<LabelledFormula> source() {
+          return rebecaToLTL(source.formulaFile[0], source.formulaFile[1], false);
     }
+    // Stream<LabelledFormula> source() throws IOException {
+    //   return stringSource().map((String line) -> {
+    //     try {
+    //       return LtlParser.parse(line);
+    //       // return convertingFacade();
+    //     } catch (RecognitionException | ParseCancellationException ex) {
+    //       throw new IllegalArgumentException(line, ex);
+    //     }
+    //   });
+    // }
   }
 
 

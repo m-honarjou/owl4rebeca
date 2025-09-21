@@ -90,6 +90,13 @@ repositories {
     mavenCentral()
 }
 
+configurations.all {
+    resolutionStrategy {
+        force("org.antlr:antlr4-runtime:4.8")
+        force("org.antlr:antlr4:4.8")
+    }
+}
+
 dependencies {
     // https://github.com/google/guava
     implementation("com.google.guava", "guava", "31.1-jre")
@@ -129,7 +136,7 @@ dependencies {
     testImplementation("org.junit.jupiter", "junit-jupiter-params", "5.6.2")
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.6.2")
 
-    antlr("org.antlr", "antlr4", "4.9.3")
+    antlr("org.antlr", "antlr4", "4.8")
 
     // https://mvnrepository.com/artifact/com.google.auto.value/auto-value
     compileOnly("com.google.auto.value", "auto-value-annotations", "1.8.2")
